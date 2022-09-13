@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>U+ Next MultiView - Configure</title>
+  <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column bg-white">
+    <!-- Main Content -->
+    <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+    <div th:replace="config/config_header.html :: config_header"></div>
+    <div id="content" th:fragment="fragment-roles">
+        <!-- Configure - Roles-->
+        <div id="Configure_Roles" th:if="${roles_id==null}">
+          <div class="row">
+            <div class="col-lg-12 mb-4">
+              <div class="card shadow mb-4">
+                <div class="card-body">
+                  <div class="table-responsive" >
+                    <table class="table table-bordered text-center table-hover">
+                      <colgroup>
+                        <col style="width:5%">
+                        <col style="width:10%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                        <col style="width:15%">
+                      </colgroup>
+                      <thead>
+                      <tr>
+                        <th>No.</th>
+                        <th>name</th>
+                        <th>Input</th>
+                        <th>Packager</th>
+                        <th>Resize</th>
+                        <th>Composer</th>
+                        <th>Video</th>
+                        <th>Abr</th>
+                      </tr>
+                      </thead>
+                      <tbody th:if="${getListRoles!=null}">
+                      <tr class="text-center cursor-pointer" th:each="list, i:${getListRoles}" th:onclick="|location.href='@{/dashboard/config/roles(roles_id = ${list.id},input_streams = ${list.input_streams},preset_group_id_1 = ${list.preset_group_id_1},preset_group_id_2 = ${list.preset_group_id_2})}'|">
+                        <td th:text="${#lists.size(getListRoles)-i.index}"></td>
+                        <td th:text="${list.id}"></td>
+                        <td th:text="${list.input_group_id}"></td>
+                        <td th:text="${list.packager_group_id}"></td>
+                        <td th:text="${list.resize_group_id}"></td>
+                        <td th:text="${list.grid_composer_group_id}"></td>
+                        <td th:text="${list.encoder_group_id}"></td>
+                        <td th:text="${list.abr_resizer_group_id}"></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-primary"  onclick="Config_Roles_Add_On()">추가하기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- / Configure - Roles-->
+
+        <!-- Configure_Roles 팝업 창 -->
+        <form id="Configure_Roles_Add" name="Insert_Roles" th:if="${roles_id}==null" th:action="@{/dashboard/config/roles/update.do}" method="post" style="display: none;">
+          <div class="col-lg-12 mb-4">
+            <div class="card shadow mb-4">
+
+              <div class="card-body">
+                <div class="text-right">
+                  <button type="button" class="close"><span aria-hidden="true" onclick="location.href='roles'"><h2>×</h2></span>
+                  </button>
+                </div>
+
+                <div class="row">
+                  <div class="form-group">
+                    <div class="form-inline">
+                      Name&nbsp;&nbsp;
+                      <input type="text" class="form-control" th:name="id" required>
+                      <input type="hidden" class="form-control" th:name="create_time">
+                      <input type="hidden" class="form-control" th:name="query" value="insert">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="w-75">
+                    <div class="border">
+                      <div class="container_fluid">
+                        <div class="form-group pt-3">
+                          <div class="form-inline" >
+                            <div class="col-2">
+                              <span>Input Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <label>
+                                <select class="form-select form-select-sm form-control w-100" th:name="input_group_id" th:onchange="putInputStreams()">
+                                    <option value="선택">선택</option>
+                                    <option th:each="input_id : ${getListInput}" th:value="${input_id.group_id}" th:utext="${input_id.group_id}"></option>
+                                  </select>
+                              </label>
+                              <input type="hidden" class="form-control" th:name="input_streams" >
+                            </div>
+                            <div class="col-2">
+                              <span>Composer</span>
+                            </div>
+                            <div class="col-4">
+                              <select class="form-select form-select-sm form-control w-100" th:name="grid_composer_group_id">
+                                <option value="선택">선택</option>
+                                <option th:each="composer_id : ${getListComposer}" th:value="${composer_id.group_id}" th:utext="${composer_id.group_id}"></option>
+                              </select>
+                            </div>
+
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <div class="form-inline">
+                            <div class="col-2">
+                              <span>Packager Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <input type="text" name="packager_group_id" class="form-control w-75" readonly required>
+                              <a data-toggle="modal" data-target="#Configure_Roles_Packager" class="btn btn-info btn-user">선택</a>
+                            </div>
+                            <div class="col-2">
+                              <span>Video Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <select class="form-select form-select-sm form-control w-100" th:name="encoder_group_id">
+                                <option value="선택">선택</option>
+                                <option th:each="video_id : ${getListVideo}" th:value="${video_id.group_id}" th:utext="${video_id.group_id}"></option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <div class="form-inline" >
+                            <div class="col-2">
+                              <span>Resize Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <select class="form-select form-select-sm form-control w-100" th:name="resize_group_id">
+                                <option value="선택">선택</option>
+                                <option th:each="resize_id : ${getListResizer}" th:value="${resize_id.group_id}" th:utext="${resize_id.group_id}"></option>
+                              </select>
+                            </div>
+                            <div class="col-2">
+                              <span>Abr Resize Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <select class="form-select form-select-sm form-control w-100" th:name="abr_resizer_group_id">
+                                <option value="선택">선택</option>
+                                <option th:each="abr_id : ${getListAbrResizer}" th:value="${abr_id.group_id}" th:utext="${abr_id.group_id}"></option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <hr>
+                        <!-- Preset Group ID 1-->
+                        <div class="form-group">
+                          <div class="form-inline">
+                            <div class="col-2">
+                              <span>Preset Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <input type="text" name="preset_group_id_1" class="form-control" required>
+                            </div>
+                            <div class="col-2">
+                              <span>Packager ID</span>
+                            </div>
+                            <div class="col-4">
+                              <select class="form-select form-select-sm form-control w-100" th:name="packager_id_1">
+                                <option value="선택">선택</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="Roles_Row">
+                          <div class="form-group" name="Roles_1_1">
+                            <div class="form-inline">
+                              <div class="col-3">
+                                <span class="">ID 1+1 Grid Process</span>
+                                <input type="text" name="Process_1_1" class="form-control w-25 " readonly required>
+                                <input type="hidden" name="Source_1_1" class="form-control">
+                                <input type="hidden" name="Resize_1_1" class="form-control">
+                                <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Grid_Processer" data-backdrop="static" onclick="getProcess(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                              <div class="col-3">
+                                <span>Composer</span>
+                                <input type="text" name="Composer_1_1" class="form-control w-25" readonly>
+                                <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Composer" data-backdrop="static" onclick="getComposerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                              <div class="col-3">
+                                <span>abr_resizer</span>
+                                <input type="text" name="Abr_1_1" class="form-control w-25" readonly>
+                                <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Abr" data-backdrop="static" onclick="getAbrResizerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                              <div class="col-3">
+                                <span>video</span>
+                                <input type="text" name="Video_1_1" class="form-control w-25" readonly>
+                                <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Video" data-backdrop="static" onclick="getVideoId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- preset1_ 1+2 process 위치 -->
+                          <!-- preset1_ 1+3 process 위치 -->
+                        </div>
+                        <!-- / Preset Group ID 1-->
+                        <hr>
+                        <!-- Preset Group ID 2-->
+                        <div class="form-group">
+                          <div class="form-inline">
+                            <div class="col-2">
+                              <span>Preset Group ID</span>
+                            </div>
+                            <div class="col-4">
+                              <input type="text" name="preset_group_id_2" class="form-control" required>
+                            </div>
+                            <div class="col-2">
+                              <span>Packager ID</span>
+                            </div>
+                            <div class="col-4">
+                              <select class="form-select form-select-sm form-control w-100" th:name="packager_id_2">
+                                <option value="선택">선택</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="Roles2_Row">
+                          <div class="form-group">
+                            <div class="form-inline">
+                              <div class="col-3">
+                                <span class="">Thumbnail Grid Process</span>
+                                <input type="text" name="Process2_1_1" class="form-control w-25 "readonly required>
+                                <input type="hidden" name="Source2_1_1" class="form-control">
+                                <input type="hidden" name="Resize2_1_1" class="form-control">
+                                <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Grid_Processer" data-backdrop="static" onclick="getProcess(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                              <div class="col-3">
+                                <span>Composer</span>
+                                <input type="text" name="Composer2_1_1" class="form-control w-25"readonly required>
+                                <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Composer" data-backdrop="static" onclick="getComposerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                              <div class="col-3">
+                                <span>abr_resizer</span>
+                                <input type="text" name="Abr2_1_1" class="form-control w-25" readonly >
+                                <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Abr" data-backdrop="static" onclick="getAbrResizerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                              <div class="col-3">
+                                <span>video</span>
+                                <input type="text" name="Video2_1_1" class="form-control w-25" readonly required>
+                                <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Video" data-backdrop="static" onclick="getVideoId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Roles2 1+2 Process 위치-->
+                          <!-- Roles2 1+3 Process 위치-->
+                        </div>
+                        <!-- / Preset Group ID 2-->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr>
+
+                <div class="container_fluid pt-3">
+                  <div class="row">
+                    <div class="col">
+                      <div class="d-inline">
+                        <a data-toggle="modal" data-target="#Configure_Roles_List" class="btn btn-primary btn-user ">
+                          불러오기
+                        </a>
+                      </div>
+                    </div>
+                    <div class="col text-right">
+                      <button onclick="return chk_GroupId()" class="btn btn-dark btn-user ">
+                        저장하기
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </form>
+        <!-- Configure_Roles_Add 팝업 창 -->
+
+      <!-- Configure_Roles_Call 팝업 창 -->
+      <form id="Configure_Roles_Call" th:if="${roles_id}!=null" th:action="@{/dashboard/config/roles/update.do}" method="post">
+        <div class="col-lg-12 mb-4">
+          <div class="card shadow mb-4">
+
+            <div class="card-body">
+              <div class="text-right">
+                <button type="button" class="close"><span aria-hidden="true" onclick="location.href='roles'"><h2>×</h2></span>
+                </button>
+              </div>
+
+              <div class="row">
+                <div class="form-group">
+                  <div class="form-inline">
+                    Name&nbsp;&nbsp;
+                    <input type="text" class="form-control" th:value="${roles_id}" th:if="${fix}!=1" th:name="id" readonly required>
+                    <input type="text" class="form-control" th:value="${roles_id}+'_1'" th:if="${fix}==1" th:name="id" required>
+                    <input type="hidden" class="form-control" th:value="${getSelectRoles.create_time}" th:name="create_time" >
+                    <input type="hidden" class="form-control" th:name="query" th:if="${fix}!=1" value="update">
+                    <input type="hidden" class="form-control" th:name="query" th:if="${fix}==1" value="insert">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="w-75">
+                  <div class="border">
+                    <div class="container_fluid">
+                      <div class="form-group pt-3">
+                        <div class="form-inline" >
+                          <div class="col-2">
+                            <span>Input Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <label>
+                              <select class="form-select form-select-sm form-control w-100" th:name="input_group_id" th:onchange="putInputStreams()">
+                                <option value="선택">선택</option>
+                                <option th:each="input_id : ${getListInput}" th:selected="${input_id.group_id}==${getSelectRoles.input_group_id}" th:value="${input_id.group_id}" th:utext="${input_id.group_id}"></option>
+                              </select>
+                            </label>
+                            <input type="hidden" class="form-control" th:value="${getSelectRoles.input_streams}" th:name="input_streams">
+                          </div>
+                          <div class="col-2">
+                            <span>Composer</span>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-select form-select-sm form-control w-100" th:name="grid_composer_group_id">
+                              <option value="선택">선택</option>
+                              <option th:each="composer_id : ${getListComposer}" th:selected="${composer_id.group_id}==${getSelectRoles.grid_composer_group_id}" th:value="${composer_id.group_id}" th:utext="${composer_id.group_id}"></option>
+                            </select>
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="form-inline">
+                          <div class="col-2">
+                            <span>Packager Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <input type="text" name="packager_group_id" th:value="${getSelectRoles.packager_group_id}" class="form-control w-75" readonly required>
+                            <a data-toggle="modal" data-target="#Configure_Roles_Packager" class="btn btn-info btn-user">선택</a>
+                          </div>
+                          <div class="col-2">
+                            <span>Video Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-select form-select-sm form-control w-100" th:name="encoder_group_id">
+                              <option value="선택">선택</option>
+                              <option th:each="video_id : ${getListVideo}" th:selected="${video_id.group_id}==${getSelectRoles.encoder_group_id}" th:value="${video_id.group_id}" th:utext="${video_id.group_id}"></option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <div class="form-inline" >
+                          <div class="col-2">
+                            <span>Resize Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-select form-select-sm form-control w-100" th:name="resize_group_id">
+                              <option value="선택">선택</option>
+                              <option th:each="resize_id : ${getListResizer}" th:selected="${resize_id.group_id}==${getSelectRoles.resize_group_id}" th:value="${resize_id.group_id}" th:utext="${resize_id.group_id}"></option>
+                            </select>
+                          </div>
+                          <div class="col-2">
+                            <span>Abr Resize Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-select form-select-sm form-control w-100" th:name="abr_resizer_group_id">
+                              <option value="선택">선택</option>
+                              <option th:each="abr_id : ${getListAbrResizer}" th:selected="${abr_id.group_id}==${getSelectRoles.abr_resizer_group_id}" th:value="${abr_id.group_id}" th:utext="${abr_id.group_id}"></option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <hr>
+                      <!-- Preset Group ID 1-->
+                      <div class="form-group">
+                        <div class="form-inline">
+                          <div class="col-2">
+                            <span>Preset Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <input type="text" th:value="${getSelectRoles.preset_group_id_1}" name="preset_group_id_1" class="form-control" required>
+                          </div>
+                          <div class="col-2">
+                            <span>Packager ID</span>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-select form-select-sm form-control w-100"  th:name="packager_id_1">
+                              <option value="선택">선택</option>
+                              <option th:selected="${getSelectRoles.packager_id_1}" th:value="${getSelectRoles.packager_id_1}" th:utext="${getSelectRoles.packager_id_1}"></option>
+                              <option th:value="${getSelectRoles.packager_id_2}" th:utext="${getSelectRoles.packager_id_2}"></option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="Roles_Row">
+                        <div class="form-group" name="Roles_1_1">
+                          <div class="form-inline" th:each="list_1_1 : ${preset_group_id_1_1}">
+                            <div class="col-3">
+                              <span class="">ID 1+1 Grid Process</span>
+                              <input type="text" th:value="${list_1_1.id}" name="Process_1_1" class="form-control w-25 " readonly required>
+                              <input type="hidden" th:value="${list_1_1.source_id}" name="Source_1_1" class="form-control">
+                              <input type="hidden" th:value="${list_1_1.resizer_id}" name="Resize_1_1" class="form-control">
+                              <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Grid_Processer" data-backdrop="static" onclick="getProcess(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>Composer</span>
+                              <input type="text" th:value="${list_1_1.grid_composer}" name="Composer_1_1" class="form-control w-25" readonly required>
+                              <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Composer" data-backdrop="static" onclick="getComposerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>abr_resizer</span>
+                              <input type="text" th:value="${list_1_1.abr_resizer}" name="Abr_1_1" class="form-control w-25" readonly>
+                              <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Abr" data-backdrop="static" onclick="getAbrResizerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>video</span>
+                              <input type="text" th:value="${list_1_1.encoder}" name="Video_1_1" class="form-control w-25" readonly required>
+                              <a data-id="_1_1" data-toggle="modal" data-target="#Configure_Roles_Video" data-backdrop="static" onclick="getVideoId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group" name="Roles_1_2" th:if="${input_streams}==3 or ${input_streams}==4 or ${input_streams}==5 or ${input_streams}==6 or ${input_streams}==7">
+                          <div class="form-inline" th:each="list_1_2 : ${preset_group_id_1_2}">
+                            <div class="col-3">
+                              <span class="">ID 1+2 Grid Process</span>
+                              <input type="text" th:value="${list_1_2.id}" name="Process_1_2" class="form-control w-25 " readonly required>
+                              <input type="hidden" th:value="${list_1_2.source_id}" name="Source_1_2" class="form-control">
+                              <input type="hidden" th:value="${list_1_2.resizer_id}" name="Resize_1_2" class="form-control">
+                              <a data-id="_1_2" data-toggle="modal" data-target="#Configure_Roles_Grid_Processer" data-backdrop="static" onclick="getProcess(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>Composer</span>
+                              <input type="text" th:value="${list_1_2.grid_composer}" name="Composer_1_2" class="form-control w-25" readonly required>
+                              <a data-id="_1_2" data-toggle="modal" data-target="#Configure_Roles_Composer" data-backdrop="static" onclick="getComposerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>abr_resizer</span>
+                              <input type="text" th:value="${list_1_2.abr_resizer}" name="Abr_1_2" class="form-control w-25" readonly>
+                              <a data-id="_1_2" data-toggle="modal" data-target="#Configure_Roles_Abr" data-backdrop="static" onclick="getAbrResizerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>video</span>
+                              <input type="text" th:value="${list_1_2.encoder}" name="Video_1_2" class="form-control w-25"readonly required>
+                              <a data-id="_1_2" data-toggle="modal" data-target="#Configure_Roles_Video" data-backdrop="static" onclick="getVideoId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group" name="Roles_1_3" th:if="${input_streams}==4 or ${input_streams}==5 or ${input_streams}==6">
+                          <div class="form-inline" th:each="list_1_3 : ${preset_group_id_1_3}">
+                            <div class="col-3">
+                              <span class="">ID 1+3 Grid Process</span>
+                              <input type="text" th:value="${list_1_3.id}" name="Process_1_3" class="form-control w-25 " readonly required>
+                              <input type="hidden" th:value="${list_1_3.source_id}" name="Source_1_3" class="form-control">
+                              <input type="hidden" th:value="${list_1_3.resizer_id}" name="Resize_1_3" class="form-control">
+                              <a data-id="_1_3" data-toggle="modal" data-target="#Configure_Roles_Grid_Processer" data-backdrop="static" onclick="getProcess(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>Composer</span>
+                              <input type="text" th:value="${list_1_3.grid_composer}" name="Composer_1_3" class="form-control w-25"readonly required>
+                              <a data-id="_1_3" data-toggle="modal" data-target="#Configure_Roles_Composer" data-backdrop="static" onclick="getComposerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>abr_resizer</span>
+                              <input type="text" th:value="${list_1_3.abr_resizer}" name="Abr_1_3" class="form-control w-25" readonly>
+                              <a data-id="_1_3" data-toggle="modal" data-target="#Configure_Roles_Abr" data-backdrop="static" onclick="getAbrResizerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>video</span>
+                              <input type="text" th:value="${list_1_3.encoder}" name="Video_1_3" class="form-control w-25"readonly required>
+                              <a data-id="_1_3" data-toggle="modal" data-target="#Configure_Roles_Video" data-backdrop="static" onclick="getVideoId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- / Preset Group ID 1-->
+                      <hr>
+                      <!-- Preset Group ID 2-->
+                      <div class="form-group">
+                        <div class="form-inline">
+                          <div class="col-2">
+                            <span>Preset Group ID</span>
+                          </div>
+                          <div class="col-4">
+                            <input type="text" th:value="${getSelectRoles.preset_group_id_2}" name="preset_group_id_2" class="form-control" required>
+                          </div>
+                          <div class="col-2">
+                            <span>Packager ID</span>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-select form-select-sm form-control w-100" th:value="${getSelectRoles.packager_id_2}" th:name="packager_id_2">
+                              <option value="선택">선택</option>
+                              <option th:value="${getSelectRoles.packager_id_1}" th:utext="${getSelectRoles.packager_id_1}"></option>
+                              <option th:selected="${getSelectRoles.packager_id_2}" th:value="${getSelectRoles.packager_id_2}" th:utext="${getSelectRoles.packager_id_2}"></option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="Roles2_Row">
+                        <div class="form-group" name="Roles2_1_1">
+                          <div class="form-inline" th:each="list_2_1 : ${preset_group_id_2_1}">
+                            <div class="col-3">
+                              <span class="">Thumbnail Grid Process</span>
+                              <input type="text" th:value="${list_2_1.id}" name="Process2_1_1" class="form-control w-25 "readonly required>
+                              <input type="hidden" th:value="${list_2_1.source_id}" name="Source2_1_1" class="form-control" >
+                              <input type="hidden" th:value="${list_2_1.resizer_id}" name="Resize2_1_1" class="form-control" >
+                              <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Grid_Processer" data-backdrop="static" onclick="getProcess(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>Composer</span>
+                              <input type="text" th:value="${list_2_1.grid_composer}" name="Composer2_1_1" class="form-control w-25" readonly required>
+                              <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Composer" data-backdrop="static" onclick="getComposerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>abr_resizer</span>
+                              <input type="text" th:value="${list_2_1.abr_resizer}" name="Abr2_1_1" class="form-control w-25"readonly >
+                              <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Abr" data-backdrop="static" onclick="getAbrResizerId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                            <div class="col-3">
+                              <span>video</span>
+                              <input type="text" th:value="${list_2_1.encoder}" name="Video2_1_1" class="form-control w-25"readonly required>
+                              <a data-id="2_1_1" data-toggle="modal" data-target="#Configure_Roles_Video" data-backdrop="static" onclick="getVideoId(this)" class="btn btn-info btn-user btn-modal">선택</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- / Preset Group ID 2-->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr>
+
+              <div class="container_fluid pt-3">
+                <div class="row">
+                  <div class="col">
+                    <div class="d-inline">
+                      <button type="submit" formaction="/dashboard/config/roles/delete.do" onclick="if(!confirm('삭제하시면 복구할 수 없습니다. \n정말로 삭제하시겠습니까?')){return false;}" class="btn btn-primary btn-user ">
+                        삭제하기
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col text-right">
+                    <button type="submit" class="btn btn-dark btn-user">
+                      저장하기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </form>
+      <!-- Configure_Roles_Call 팝업 창 -->
+
+      </div>
+      <hr class="mt-2 mb-3"/>
+  </div>
+  <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Configure_Roles_Packager_item 팝업 창 -->
+<div id="Configure_Roles_Packager" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          Packager_ID_List
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="">
+              <div th:each="list : ${getListPackager}" class="form-check">
+                <input type="checkbox" th:value="${list.group_id}" th:name="getListPackager" class="form-check-input">
+                <label th:text="${list.group_id}"  class="form-check-label"></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="container_fluid pt-1">
+          <div class="row">
+            <div class="col text-right">
+              <button onclick="Select_Packagers()" data-dismiss="modal" class="btn btn-dark btn-user">
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Configure_Roles_Packager_item 팝업 창 -->
+
+<!-- Configure_Roles_Grid_Processer 팝업 창 -->
+<div id="Configure_Roles_Grid_Processer" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          Grid Processer
+          <input type="hidden" name="which_data" class="form-control">
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="Process_Body">
+        <!-- addRow 위치-->
+        </div>
+
+        <hr>
+
+        <div class="container_fluid pt-1">
+          <div class="row">
+            <div class="col">
+              <div class="d-inline">
+                <a id="addProcess" onclick="addRow(this);" class="btn btn-primary btn-user ">
+                  추가하기
+                </a>
+              </div>
+            </div>
+            <div class="col text-right">
+              <a onclick="confirmProcessData(this)"  data-dismiss="modal" class="btn btn-dark btn-user ">
+                저장하기
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Configure_Roles_List 팝업 창 -->
+
+<!-- Configure_Roles_Composer_ID_List 팝업 창 -->
+<div id="Configure_Roles_Composer" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          Composer_ID_List
+          <input type="hidden" name="which_data" class="form-control">
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="composer">
+              <!-- composer checkbox 위치 -->
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="container_fluid pt-1">
+          <div class="row">
+            <div class="col text-right">
+              <button onclick="confirmComposerData()" data-dismiss="modal" class="btn btn-dark btn-user">
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Configure_Roles_Composer_ID_List 팝업 창 -->
+
+<!-- Configure_Roles_Abr_Resizer_ID_List 팝업 창 -->
+<div id="Configure_Roles_Abr" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          Abr_Resizer_ID_List
+          <input type="hidden" name="which_data" class="form-control">
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="abr">
+              <!-- Abr checkbox 위치 -->
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="container_fluid pt-1">
+          <div class="row">
+            <div class="col text-right">
+              <button onclick="confirmAbrData()" data-dismiss="modal" class="btn btn-dark btn-user">
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Configure_Roles_Abr_Resizer_ID_List 팝업 창 -->
+
+<!-- Configure_Roles_Video_ID_List 팝업 창 -->
+<div id="Configure_Roles_Video" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          Video_ID_List
+          <input type="hidden" name="which_data" class="form-control">
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="video">
+              <!-- Video checkbox 위치 -->
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="container_fluid pt-1">
+          <div class="row">
+            <div class="col text-right">
+              <button onclick="confirmVideoData()" data-dismiss="modal" class="btn btn-dark btn-user">
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Configure_Roles_Video_ID_List 팝업 창 -->
+
+<!-- Configure_Roles_List 팝업 창 -->
+<div id="Configure_Roles_List" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          List
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="text-center btn-block">
+              <div th:each="list : ${getListRoles}" class="pb-1">
+                <a class="btn btn-light btn-block text-decoration-none" th:text="${list.id}" th:href="@{/dashboard/config/roles(roles_id = ${list.id},input_streams = ${list.input_streams},preset_group_id_1 = ${list.preset_group_id_1},preset_group_id_2 = ${list.preset_group_id_2},fix='1')}"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Configure_Roles_List 팝업 창 -->
+
+<!-- 레이어 도움말 -->
+<div id="divLayer" class="overLayer">
+  <div class="">
+    <strong><span id="detail_value"></span></strong>
+  </div>
+</div>
+
+
+<script th:inline="javascript" defer src="/js/config/roles.js"></script>
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+</body>
+
+<script>
+  history.pushState(null, null, 'roles');
+  window.onpopstate = function(event) {
+    history.go(1);
+  };
+</script>
+
+
+</html>

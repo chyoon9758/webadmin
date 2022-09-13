@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ResizeDAO">
+    <select id="getListAll" resultType="ResizeDTO">
+        select * from next_multi_view.TEST_RESIZE_INFO;
+    </select>
+    <select id="getListGroupConcat" resultType="ResizeConcatDTO">
+        select selected, group_id, group_concat(id order by id separator ', ') channels from next_multi_view.TEST_RESIZE_INFO group by group_id, create_time,selected order by create_time desc;
+    </select>
+    <select id="getResizeByGroupId" resultType="ResizeDTO">
+        SELECT * FROM next_multi_view.TEST_RESIZE_INFO WHERE group_id = #{group_id};
+    </select>
+    <select id="getResizerAPI" resultType="ResizerListAPI">
+        SELECT id, width, height FROM next_multi_view.TEST_RESIZE_INFO WHERE group_id = #{group_id};
+    </select>
+    <select id="getAbrResizerAPI" resultType="AbrResizerListAPI">
+        SELECT id, width, height FROM next_multi_view.TEST_RESIZE_INFO WHERE group_id = #{group_id};
+    </select>
+    <delete id="deleteListByGroupId">
+        DELETE FROM next_multi_view.TEST_RESIZE_INFO WHERE group_id = #{group_id};
+    </delete>
+    <insert id="insertList">
+        INSERT INTO next_multi_view.TEST_RESIZE_INFO VALUES
+        <foreach collection="resizeDTOList" item="list" separator=",">
+            (#{list.group_id}, #{list.id}, #{list.width}, #{list.height} <if test="now">, now()</if><if test="!now">, #{list.create_time}</if>, #{list.selected})
+        </foreach>
+    </insert>
+</mapper>

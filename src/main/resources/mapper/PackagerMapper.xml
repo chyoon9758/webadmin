@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.admin.DAO.PackagerDAO">
+    <select id="getListAll" resultType="com.web.admin.DTO.PackagerDTO">
+        select * from next_multi_view.TEST_PACKAGER_INFO order by create_time desc;
+    </select>
+    <select id="getPackagerByGroupId" resultType="com.web.admin.DTO.PackagerDTO">
+        SELECT * FROM next_multi_view.TEST_PACKAGER_INFO WHERE group_id = #{group_id};
+    </select>
+    <select id="getSegmenter" resultType="com.web.admin.DTO.api.transcodingStandby.uplusIdolliveConfig.transConfigs.packagerList.segmenter.SegmenterAPI">
+        SELECT service, container, mpd_path, mpd_name, segment_path_prefix, m3u8_path, m3u8_name, segment_duration, `window`, minupdate_period, preserved_segments FROM next_multi_view.TEST_PACKAGER_INFO WHERE group_id = #{group_id};
+    </select>
+    <select id="getDrm" resultType="com.web.admin.DTO.api.transcodingStandby.uplusIdolliveConfig.transConfigs.packagerList.segmenter.DrmAPI">
+        SELECT enable, kms_url, kms_token, content_id FROM next_multi_view.TEST_PACKAGER_INFO WHERE group_id = #{group_id};
+    </select>
+    <select id="getManifestGenerator" resultType="com.web.admin.DTO.api.transcodingStandby.uplusIdolliveConfig.transConfigs.packagerList.ManifestGeneratorAPI">
+        SELECT dash, hls FROM next_multi_view.TEST_PACKAGER_INFO WHERE group_id = #{group_id};
+    </select>
+    <select id="getPublishingInfo" resultType="com.web.admin.DTO.api.transcodingStandby.uplusIdolliveConfig.transConfigs.packagerList.PublishingInfoAPI">
+        SELECT name, endpoint, accessKey, secretKey, region FROM next_multi_view.TEST_PACKAGER_INFO WHERE group_id = #{group_id};
+    </select>
+    <delete id="deleteByGroupId">
+        DELETE FROM next_multi_view.TEST_PACKAGER_INFO WHERE group_id = #{group_id};
+    </delete>
+    <insert id="insertRow">
+        INSERT INTO next_multi_view.TEST_PACKAGER_INFO VALUES
+        (#{id}, #{group_id}, #{enable}, #{kms_url},
+        #{kms_token}, #{content_id}, #{service}, #{container}, #{mpd_path}, #{mpd_name}, #{segment_path_prefix},
+        #{m3u8_path}, #{m3u8_name}, #{segment_duration}, #{window}, #{minupdate_period}, #{preserved_segments},
+        #{dash}, #{hls}, #{accessKey}, #{name}, #{endpoint}, #{secretKey}, #{region}, now(), 0)
+    </insert>
+    <update id="updateRow">
+        UPDATE next_multi_view.TEST_PACKAGER_INFO SET
+        enable = #{enable}, kms_url = #{kms_url}, kms_token = #{kms_token}, content_id = #{content_id}, service = #{service},
+        container = #{container}, mpd_path = #{mpd_path}, mpd_name = #{mpd_name}, segment_path_prefix = #{segment_path_prefix},
+        m3u8_path = #{m3u8_path}, m3u8_name = #{m3u8_name}, segment_duration = #{segment_duration}, `window` = #{window},
+        minupdate_period = #{minupdate_period}, preserved_segments = #{preserved_segments}, dash = #{dash}, hls = #{hls},
+        accessKey = #{accessKey}, name = #{name}, endpoint = #{endpoint}, secretKey = #{secretKey},
+        region = #{region}
+        where group_id = #{group_id}
+    </update>
+</mapper>

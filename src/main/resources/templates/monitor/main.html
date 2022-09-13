@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>U+ Next MultiView - Dashboard</title>
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column bg-white">
+
+        <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- 대쉬보드 - Monitor_Main-->
+            <div class="container-fluid" id="DashBoard_Monitor">
+                <div style="font-size: 20px; ">
+                    DashBoard
+                </div>
+
+                <!-- 대쉬보드 - Device-->
+                <div id="DashBoard_Monitor_Device">
+                    <hr>
+                    <li>
+                        Device
+                    </li>
+                    <br>
+                    <div class="row">
+                        <!-- Content Column -->
+                        <div class="col-lg-12 mb-4">
+                            <div class="card shadow mb-4" th:if="${Device!=null}">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="d-inline col" th:text="${Device.getName()}">
+                                        </div>
+                                        <div class="d-inline col text-right">
+                                            <button type="button" id="standBy_button" class="btn btn-success btn-sm" style="width:100px;" onclick="standBy_Button()" data-toggle="modal" data-target="#Data_loading" th:disabled="${StatusAPI.getIdolLive()==null} or ${StatusAPI.getIdolLive().getStatus()=='prepared'} or ${StatusAPI.getIdolLive().getStatus()=='running'} or ${StatusAPI.getIdolLive().getStatus()=='error'}">
+                                                standBy
+                                            </button>
+                                            <button type="button" id="start_button" class="btn btn-info btn-sm" style="width:100px;" onclick="start_Button()" data-toggle="modal" data-target="#Data_loading" th:disabled="${StatusAPI.getIdolLive()==null} or ${StatusAPI.getIdolLive().getStatus()=='running'} or ${StatusAPI.getIdolLive().getStatus()=='error'}">start
+                                            </button>
+                                            <button type="button" id="stop_button" class="btn btn-warning btn-sm" style="width:100px;" onclick="stop_Button()" data-toggle="modal" data-target="#Data_loading" th:disabled="${StatusAPI.getIdolLive()==null}">stop
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div>
+                                        <div class="row">
+                                            <div class="d-inline col">
+                                                Status:
+                                                <span id="Device_status">
+                                                <span th:if="${StatusAPI.getIdolLive()==null}">no connection</span>
+                                                <span th:if="${StatusAPI.getIdolLive()!=null}">
+                                                    <span th:if="${StatusAPI.getIdolLive().getStatus()=='unknown nmvt status'}">off</span>
+                                                    <span th:if="${StatusAPI.getIdolLive().getStatus()!='unknown nmvt status'} and ${StatusAPI.getIdolLive().getStatus()!='running'}" th:text="${StatusAPI.getIdolLive().getStatus()}"></span>
+                                                    <span th:if="${StatusAPI.getIdolLive().getStatus()=='running'}" th:text="${StatusAPI.getIdolLive().getStatus()} + ' (Elapsed Time : ' + ${StatusAPI.getIdolLive().getElapsedTime()} + ')'"></span>
+                                                </span>
+                                                </span>
+                                            </div>
+                                            <div class="d-inline col text-right" id="Detail_button">
+                                                <button type="button" onclick="location.href='/dashboard/monitor/detail'" class="btn btn-secondary text-decoration-none" th:text="${Device.getRole()}" th:disabled="${StatusAPI.getIdolLive()==null} or ${StatusAPI.getIdolLive().getStatus()!='running'}">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / 대쉬보드 - Device-->
+
+                <!-- 대쉬보드 - 모니터 로그-->
+                <div id="DashBoard_Monitor_Log">
+                    <hr>
+                    <div>
+                        <li>
+                            모니터 로그
+                        </li>
+                        <br>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+                        <div class="col-lg-12 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <div class=" btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-light active">
+                                            <input type="radio" name="options" id="Radio_Transcoder" checked onchange="Monitor_Log_Display()">
+                                            Transcoder event
+                                        </label>
+                                        <label class="btn btn-light">
+                                            <input type="radio" name="options" id="Radio_Action" onchange="Monitor_Log_Display()">
+                                            Action event
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive" id="Transcoder_Event" style="height:500px; overflow:auto">
+                                        <table class="table table-bordered" id="Transcode_Log" width="100%" cellspacing="0">
+                                            <colgroup>
+                                                <col style="width:5%">
+                                                <col style="width:10%">
+                                                <col style="width:20%">
+                                                <col style="width:20%">
+                                                <col style="width:20%">
+                                                <col style="width:12.5%">
+                                                <col style="width:12.5%">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Status</th>
+                                                <th>Message</th>
+                                                <th>Event Message</th>
+                                                <th>Detail Event Message</th>
+                                                <th>트랜스코딩 경과시간</th>
+                                                <th>이벤트 발생시간</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="list,index : ${transcoderlog}">
+                                                <td class="text-center" th:text="${#lists.size(transcoderlog) - index.index}"></td>
+                                                <td th:text="${list.messageLevel} +': '+ ${list.status}"></td>
+                                                <td th:text="${list.message}"></td>
+                                                <td th:text="${list.errorCode}+ ': '+${list.errorString}"></td>
+                                                <td th:text="${list.errorCode2}+': ' +${list.errorString2}"></td>
+                                                <td class="text-center" th:text="${list.elapsedTime}"></td>
+                                                <td class="text-center" th:text="${list.date}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Action Event 테이블 -->
+                                    <div class="table-responsive" id="Action_Event" style="display:none; height:500px; overflow:auto">
+                                        <table class="table table-bordered" id="Action_Log">
+                                            <colgroup>
+                                                <col style="width:5%">
+                                                <col style="width:5%">
+                                                <col style="width:30%">
+                                                <col style="width:10%">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>User</th>
+                                                <th>message</th>
+                                                <th>Time</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="list,index : ${userlog}">
+                                                <td class="text-center" th:text="${#lists.size(userlog) - index.index}"></td>
+                                                <td class="text-center" th:text="${list.user}"></td>
+                                                <td th:text="${list.logString}"></td>
+                                                <td class="text-center" th:text="${list.date}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- /Action Event 테이블 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / 대쉬보드 - 모니터 로그-->
+            </div>
+            <!-- /.대쉬보드 - Monitor_Main -->
+        </div>
+        <!-- End of Main Content -->
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+<div id="Data_loading" class="modal fade" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="container">
+            <div class="row">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <li>
+                            처리 중입니다.
+                        </li>
+                    </div>
+                    <div class="card-body">
+                        <div class="pb-3">
+                            <span class="font-weight-bold"><h5>최대 2분 정도 시간이 소요될 수 있습니다.</h5></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+<style>
+    body:not(.modal-open){
+        padding-right: 0px !important;
+    }
+</style>
+<script th:inline="javascript" defer src="/js/monitor/main.js"></script>
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+</body>
+
+<script>
+
+</script>
+
+
+</html>

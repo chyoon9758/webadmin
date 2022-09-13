@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DeviceDAO">
+    <select id="getDevice" resultType="DeviceDTO">
+        select * from next_multi_view.TEST_DEVICE_LIST;
+    </select>
+    <select id="getDeviceList" resultType="DeviceDTO">
+        select * from next_multi_view.TEST_DEVICE_LIST order by create_time desc;
+    </select>
+
+    <select id="getSelectDevice" resultType="DeviceDTO">
+        select * from next_multi_view.TEST_DEVICE_LIST where name = #{name};
+    </select>
+
+    <select id="getRolesList" resultType="RolesDTO">
+        select * from next_multi_view.TEST_TRANS_ROLE_INFO order by create_time desc;
+    </select>
+
+    <insert id="insertDevice" parameterType="DeviceDTO">
+        insert into TEST_DEVICE_LIST
+        values
+        (
+            #{name},
+            #{ip},
+            #{role},
+            NOW()
+        )AS new
+        ON DUPLICATE KEY UPDATE
+             ip = new.ip,
+             role = new.role
+        ;
+    </insert>
+
+    <update id="updateDevice" parameterType="DeviceDTO">
+        update TEST_DEVICE_LIST
+        set
+            name = #{name},
+            ip = #{ip},
+            role = #{role}
+        WHERE
+            name = #{origin_name}
+        ;
+    </update>
+
+    <delete id="deleteDevice">
+        DELETE FROM TEST_DEVICE_LIST WHERE name = #{name};
+    </delete>
+</mapper>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>U+ Next MultiView - Configure</title>
+
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+</head>
+<body id="page-top">
+    <div th:fragment="monitor_header">
+        <!-- 상단 바 -->
+        <nav class="navbar navbar-expand navbar-light bg-light topbar mb-4 static-top">
+            <div class="mr-auto ml-md-3 my-2">
+                <a href="/dashboard/monitor/main" class="text-secondary text-decoration-none"><h4>U+ 넥스트 멀티뷰</h4></a>
+            </div>
+            <!-- Topbar Navbar -->
+            <ul class="navbar-nav ml-auto">
+                <!-- Nav Item - Alerts 수정 : 로그아웃-->
+                <a href="/logout" class="btn btn-light btn-icon-split">
+                    <span class="text">로그아웃</span>
+                </a>
+                <!-- Nav Item - Messages 수정 : 비밀번호 변경-->
+                <a class="btn btn-light btn-icon-split" data-toggle="modal"  data-backdrop="static" data-target="#chg_pw">
+                    <span class="text">비밀번호 변경</span>
+                </a>
+                <div class="top-bar-divider d-none d-sm-block"></div>
+
+                <!-- Nav Item - User Information -->
+            </ul>
+        </nav>
+        <!-- /상단바 -->
+
+        <!-- 모니터, 설정, 상태 -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <input type="hidden" th:value="${intervaltimeout}" name="intervaltimeout">
+                </div>
+                <div class="col text-center" th:with="url=${#httpServletRequest.requestURI}">
+                    <div class="btn-group text-decoration-none" th:if="${#strings.startsWith(url,'/dashboard/monitor')}">
+                        <a href="/dashboard/monitor/main" class="btn btn-light active">MONITOR</a>
+                        <a th:if="${(User!=null)&&(User.getAuth()!=3)}" href="/dashboard/config/device" class="btn btn-light">CONFIGURE</a>
+                    </div>
+                    <div class="btn-group text-decoration-none" th:if="${#strings.startsWith(url,'/dashboard/config')}">
+                        <a href="/dashboard/monitor/main" class="btn btn-light">MONITOR</a>
+                        <a th:if="${(User!=null)&&(User.getAuth()!=3)}" href="/dashboard/config/device" class="btn btn-light active">CONFIGURE</a>
+                    </div>
+                </div>
+                <div id="Transcoder_Status" class="col text-center">
+                    <span>상태</span>
+                    <span th:if="${StatusAPI.getIdolLive()==null}">
+                        <a class="Transcoder_Status btn btn-primary btn-icon-split" style="width:130px;">
+                            <span class="text status-text">no connection</span>
+                        </a>
+                    </span>
+                    <span th:if="${StatusAPI.getIdolLive()!=null}">
+                        <span th:if="${#strings.startsWith(StatusAPI.getIdolLive().getStatus(), 'unknown')}">
+                            <a class="Transcoder_Status btn btn-primary btn-icon-split" style="width:130px;">
+                                <span class="text status-text">off</span>
+                            </a>
+                        </span>
+                        <span th:if="${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'preparing')} or ${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'prepared')}">
+                            <a class="Transcoder_Status btn btn-success btn-icon-split" style="width:130px;">
+                                <span class="text status-text" th:text="${StatusAPI.getIdolLive().getStatus()}"></span>
+                            </a>
+                        </span>
+                        <span th:if="${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'start')} or ${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'running')}">
+                            <a class="Transcoder_Status btn btn-info btn-icon-split" style="width:130px;">
+                                <span class="text status-text" th:text="${StatusAPI.getIdolLive().getStatus()}"></span>
+                            </a>
+                        </span>
+                        <span th:if="${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'stopping')} or ${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'stopped')}">
+                            <a class="Transcoder_Status btn btn-warning btn-icon-split" style="width:130px;">
+                                <span class="text status-text" th:text="${StatusAPI.getIdolLive().getStatus()}"></span>
+                            </a>
+                        </span>
+                        <span th:if="${#strings.equals(StatusAPI.getIdolLive().getStatus(), 'error')}">
+                            <a class="Transcoder_Status btn btn-danger btn-icon-split" style="width:130px;">
+                                <span class="text status-text" th:text="${StatusAPI.getIdolLive().getStatus()}"></span>
+                            </a>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-2 mb-3"/>
+        <!-- /모니터, 설정, 상태 -->
+
+        <!-- 비밀번호 변경 팝업 창 -->
+        <div id="chg_pw" class="modal fade">
+            <div class="modal-dialog">
+                <div class="container">
+                    <div class="row">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <li>
+                                    User management
+                                </li>
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <form action="/changePw" method="post">
+                                <div class="form-group">
+                                    <div class="form-inline" role="form">
+                                        <div class="col">
+                                            <span>Old password</span>
+                                        </div>
+                                        <div class="col">
+                                            <input type="password" class="form-control form-control-user "
+                                                   id="oldPassword" name="oldPw" placeholder="Password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-inline" role="form">
+                                        <div class="col">
+                                            <span>New password</span>
+                                        </div>
+                                        <div class="col">
+                                            <input type="password" class="form-control form-control-user "
+                                                   id="newPassword" name="newPw" placeholder="Password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-inline" role="form">
+                                        <div class="col">
+                                            <span>Confirm New password</span>
+                                        </div>
+                                        <div class="col">
+                                            <input type="password" class="form-control form-control-user "
+                                                   id="confirmnewPassword" name="confirmPw" placeholder="Password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row pt-3">
+                                    <div class="col form-inline">
+<!--                                        <div class="col">-->
+<!--                                            <button type="button" class="btn btn-dark btn-user btn-block" data-dismiss="modal">취소</button>-->
+<!--                                        </div>-->
+                                        <div class="col">
+                                            <button type="submit" class="btn btn-dark btn-user btn-block">비밀번호 변경</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /비밀번호 변경 팝업 창 -->
+        <script src="/vendor/jquery/jquery.min.js"></script>
+        <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Core plugin JavaScript-->
+        <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#content-wrapper').ready(function(){
+                timer = setInterval(function(){
+                    $.ajax({
+                        type: "get",
+                        url: "/transcode/status",
+                        contentType: "application/json",
+                        success: function(data, textStatus, jqXHR){
+                            if(data.idolLive==null){
+                                $('#Transcoder_Status a').attr('class', 'btn btn-primary btn-icon-split');
+                                $('#Transcoder_Status a span').text("no connection");
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text("no connection");
+                                    $("#Detail_button button").attr('disabled', true);
+                                    $("#standBy_button").attr('disabled', true);
+                                    $("#start_button").attr('disabled', true);
+                                    $("#stop_button").attr('disabled', true);
+                                }
+                            }else if((data.idolLive.status=="preparing")||(data.idolLive.status=="prepared")){
+                                $('#Transcoder_Status a').attr('class', 'btn btn-success btn-icon-split');
+                                $('#Transcoder_Status a span').text(data.idolLive.status);
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text(data.idolLive.status);
+                                    $("#Detail_button button").attr('disabled', true);
+                                    $("#standBy_button").attr('disabled', true);
+                                    $("#start_button").attr('disabled', false);
+                                    $("#stop_button").attr('disabled', false);
+                                }
+                            }else if((data.idolLive.status=="start")||(data.idolLive.status=="running")){
+                                $('#Transcoder_Status a').attr('class', 'btn btn-info btn-icon-split');
+                                $('#Transcoder_Status a span').text(data.idolLive.status);
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text(data.idolLive.status + ' (Elapsed Time : ' + data.idolLive.elapsedTime + ')');
+                                    $("#Detail_button button").attr('disabled', false);
+                                    $("#standBy_button").attr('disabled', true);
+                                    $("#start_button").attr('disabled', true);
+                                    $("#stop_button").attr('disabled', false);
+                                }
+                            }else if((data.idolLive.status=="stopping")||(data.idolLive.status=="stopped")){
+                                $('#Transcoder_Status a').attr('class', 'btn btn-warning btn-icon-split');
+                                $('#Transcoder_Status a span').text(data.idolLive.status);
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text(data.idolLive.status);
+                                    $("#Detail_button button").attr('disabled', true);
+                                    $("#standBy_button").attr('disabled', false);
+                                    $("#start_button").attr('disabled', true);
+                                    $("#stop_button").attr('disabled', false);
+                                }
+                            }else if(data.idolLive.status=="error"){
+                                $('#Transcoder_Status a').attr('class', 'btn btn-danger btn-icon-split');
+                                $('#Transcoder_Status a span').text(data.idolLive.status);
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text(data.idolLive.status);
+                                    $("#Detail_button button").attr('disabled', true);
+                                    $("#standBy_button").attr('disabled', true);
+                                    $("#start_button").attr('disabled', true);
+                                    $("#stop_button").attr('disabled', false);
+                                }
+                            }else if(data.idolLive.status=="unknown nmvt status"){
+                                $('#Transcoder_Status a').attr('class', 'btn btn-primary btn-icon-split');
+                                $('#Transcoder_Status a span').text('off');
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text('off');
+                                    $("#Detail_button button").attr('disabled', true);
+                                    $("#standBy_button").attr('disabled', false);
+                                    $("#start_button").attr('disabled', true);
+                                    $("#stop_button").attr('disabled', false);
+                                }
+                            }else{
+                                $('#Transcoder_Status a').attr('class', 'btn btn-primary btn-icon-split');
+                                $('#Transcoder_Status a span').text('no connection');
+                                if(window.location.pathname=="/dashboard/monitor/main"){
+                                    $("#Device_status").text("no connection");
+                                    $("#Detail_button button").attr('disabled', true);
+                                    $("#standBy_button").attr('disabled', true);
+                                    $("#start_button").attr('disabled', true);
+                                    $("#stop_button").attr('disabled', true);
+                                }
+                            }
+                            if(window.location.pathname=="/dashboard/monitor/detail"){
+                                for(let i=0; i<data.idolLive.inputStatistics.length; i++){
+                                    $(".input_table tbody:eq(" + i + ") tr td:nth-child(1)").text(data.idolLive.inputStatistics[i].videoInfo);
+                                    $(".input_table tbody:eq(" + i + ") tr td:nth-child(2)").text(data.idolLive.inputStatistics[i].audioRateLevel);
+                                    $(".input_table tbody:eq(" + i + ") tr td:nth-child(3)").text(data.idolLive.inputStatistics[i].aspectRatio);
+                                    $(".input_table tbody:eq(" + i + ") tr td:nth-child(4)").text(data.idolLive.inputStatistics[i].frames);
+                                    $(".input_table tbody:eq(" + i + ") tr td:nth-child(5)").text(data.idolLive.inputStatistics[i].uptime);
+                                    if(data.idolLive.inputStatistics[i].audioRateLevel!='0.0kbps, 0.0')
+                                        $(".audio_bar:eq(" + i + ")").attr('style', 'height:' + ( (data.idolLive.inputStatistics[i].audioRateLevel+"").substring((data.idolLive.inputStatistics[i].audioRateLevel+"").indexOf(' ')+1, (data.idolLive.inputStatistics[i].audioRateLevel+"").length))/data.idolLive.inputStatistics[i].audioMaxlevel*100 + '%');
+                                    let domain = /*[[${domain}]]*/;
+                                    $(".thumbnail_img:eq(" + i + ") img").attr('src',data.idolLive.inputStatistics[i].thumbnailInfo.videoUrl);
+                                }
+                                let trCnt = 1;
+                                for(let i=0; i<data.idolLive.outputInfo.length; i++){
+                                    for(let j=0; j<data.idolLive.outputInfo[i].mediaInfoList.length; j++){
+                                        $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(1)").text(data.idolLive.outputInfo[i].mediaInfoList[j].name);
+
+                                        if(data.idolLive.outputInfo[i].mediaInfoList[j].type=='video'){
+                                            $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(2)").text(data.idolLive.outputInfo[i].mediaInfoList[j].presetRate + ' bps, ' + data.idolLive.outputInfo[i].mediaInfoList[j].fps + ' fps');
+                                            $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(3)").text('0 bps');
+                                        }
+                                        if(data.idolLive.outputInfo[i].mediaInfoList[j].type=='audio'){
+                                            $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(2)").text('0 bps, 0.00 fps');
+                                            if(data.idolLive.outputInfo[i].mediaInfoList[j].presetSampleRate==null)
+                                                $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(3)").text('0 bps');
+                                            else
+                                                $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(3)").text('0 bps');
+                                                // $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(3)").text(data.idolLive.outputInfo[i].mediaInfoList[j].presetSampleRate + ' bps');
+                                        }
+                                        $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(4)").text((Number.parseFloat(data.idolLive.outputInfo[i].mediaInfoList[j].rate/1024)).toFixed(2) + ' Kbps');
+                                        if(data.idolLive.outputInfo[i].mediaInfoList[j].fps==null)
+                                            $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(5)").text('');
+                                        else
+                                            $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(5)").text(Number.parseFloat(data.idolLive.outputInfo[i].mediaInfoList[j].fps).toFixed(2));
+                                        $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(6)").text('');
+                                        for(let k=0; k<data.idolLive.outputInfo[i].publishingPointInfo.length; k++){
+                                            $("#Output_Stat tr:eq(" + trCnt + ") td:nth-child(6)").append(data.idolLive.outputInfo[i].publishingPointInfo[k].type + ' ');
+                                        }
+                                        trCnt++;
+                                    }
+                                }
+                            }
+                        },
+                        error: function(data, textStatus, jqXHR){
+                            $('.Transcoder_Status').text('error');
+                            console.log(data);
+                            console.log(textStatus);
+                            console.log(jqXHR);
+                        }
+                    });
+
+                    $.ajax({
+                        type: "get",
+                        url: "/dashboard/monitor/main/getTranscoderEvent",
+                        success: function(data, textStatus, jqXHR){
+                            for(let i=0; i<data.length; i++){
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(0)").text(data.length-i);
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(1)").text(data[i].messageLevel + ': ' + data[i].status);
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(2)").text(data[i].message);
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(3)").text(data[i].errorCode + ': ' + data[i].errorString);
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(4)").text(data[i].errorCode2 + ': ' + data[i].errorString2);
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(5)").text(data[i].elapsedTime);
+                                $("#Transcoder_Event table tbody tr:eq(" + i + ") td:eq(6)").text(data[i].date);
+                            }
+                        },
+                        error: function(){}
+                    });
+
+                    $.ajax({
+                        type: "get",
+                        url: "/dashboard/monitor/main/getActionEvent",
+                        success: function(data, textStatus, jqXHR){
+                            for(let i=0; i<data.length; i++){
+                                $("#Action_Event table tbody tr:eq(" + i + ") td:eq(0)").text(data.length-i);
+                                $("#Action_Event table tbody tr:eq(" + i + ") td:eq(1)").text(data[i].user);
+                                $("#Action_Event table tbody tr:eq(" + i + ") td:eq(2)").text(data[i].logString);
+                                $("#Action_Event table tbody tr:eq(" + i + ") td:eq(3)").text(data[i].date);
+                            }
+                        },
+                        error: function(){}
+                    });
+                }, $('input[name=intervaltimeout]').val());
+            });
+            $(document).on("keyup",".splitvalue",function() { // 값에 ',' 가 들어가지 않도록
+
+                // 못쓰게 하고싶은 특수 문자가 있다면 [] 내부에 넣기
+                let regExp = /[ ,]/gi;
+
+                if( regExp.test($(this).val()) ){
+
+                    alert("','는 입력하실수 없습니다.");
+
+                    // $(this).val($(this).val().substring( 0 , $(this).val().length - 1 )); // 입력한 특수문자 한자리 지움
+                    $(this).val(""); // 전체 지움
+
+                }
+            });
+
+            $(document).on("keyup",".chkFirstValue",function() { // 값의 맨 앞에 '.' 가 들어가지 않도록
+
+                let regExp = /[ .]/gi;
+
+                // if( regExp.test($(this).val().substring(0,1)) ){
+                //     alert("값의 맨 앞에 '.'는 입력하실수 없습니다.");
+                //
+                //     $(this).val("0");
+                // }
+
+                if($(this).val().length>1){                                     // 값의 길이가 2이상일 때
+                    if($(this).val().substring(0,1)==0){                        // 값의 맨 앞이 0일 떄
+                        if(!regExp.test($(this).val().substring(0,2))){         // 값의 2번째 문자가 '.' 이 아닐때
+                            $(this).val($(this).val().replace(/(^0+)/, ""));    // 값의 왼쪽 0 값 제거
+                        }
+                    }
+                }
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <!-- 헤더 -->
+</body>
+</html>

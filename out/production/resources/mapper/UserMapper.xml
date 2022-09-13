@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserDAO">
+
+    <select id="getUserById" resultType="UserDTO">
+        SELECT * FROM next_multi_view.TEST_INFO_ADMIN WHERE id = #{id};
+    </select>
+    <insert id="insertUser">
+        INSERT INTO next_multi_view.TEST_INFO_ADMIN VALUES(#{id}, #{password}, #{auth});
+    </insert>
+    <update id="updateUser">
+        UPDATE next_multi_view.TEST_INFO_ADMIN SET password = #{password} WHERE id = #{id};
+    </update>
+</mapper>

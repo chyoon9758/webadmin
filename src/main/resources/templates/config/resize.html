@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>U+ Next MultiView - Configure</title>
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column bg-white">
+        <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+        <div th:replace="config/config_header.html :: config_header"></div>
+        <!-- Main Content -->
+        <div id="content">
+            <!-- 대쉬보드 - Configure_Main-->
+            <div id="DashBoard_Configure">
+                <!-- Configure - Resize -->
+                <div id="Configure_Resize" th:if="${group_id}==null">
+                    <div class="row">
+                        <div class="col-lg-12 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive" >
+                                        <table class="table table-bordered text-center table-hover">
+                                            <colgroup>
+                                                <col style="width:20%">
+                                                <col style="width:60%">
+                                                <col style="width:20%">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>Group</th>
+                                                <th>Channels</th>
+                                                <th>사용 여부</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody th:if="${getListGroupConcat!=null}">
+                                            <tr class="text-center" th:each="m, i : ${getListGroupConcat}" th:onclick="|location.href='@{resize(group_id=${m.getGroup_id()})}'|">
+                                                <td th:text="${m.getGroup_id()}"></td>
+                                                <td th:text="${m.getChannels}"></td>
+                                                <td><span th:if="${m.selected}==1">사용 중</span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" onclick="Config_Resize_Add_On()">추가하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / Configure - Resize-->
+                <!-- Configure_Resize_Add 팝업 창 -->
+                <form id="Configure_Resize_Add" name="Insert_Resize" th:if="${group_id}==null" style="display:none;" action="resize" method="post">
+                    <input type="hidden" value="insert" name="query">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="text-right">
+                                    <button type="button" class="close"><span aria-hidden="true" onclick="Config_Resize_Add_Off()"><h2>×</h2></span>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="form-inline" role="form">
+                                            <li>그룹 ID</li>&nbsp;&nbsp;
+                                            <input type="text" id="Config_Resize_Id" class="form-control" name="group_id" required>
+                                            <input type="hidden" name="create_time">
+                                            <input type="hidden" name="selected" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="Resize_Card">
+                                    <div class="index pb-3">
+                                        <div class="row">
+                                            <div class="w-50">
+                                                <div class="border">
+                                                    <div class="container_fluid">
+                                                        <div class="row">
+                                                            <div class="col text-right pt-2 mr-2">
+                                                                <button type="button" class="close" onclick="delRow(this)"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group pt-3">
+                                                        <div class="form-inline" role="form">
+                                                            <div class="container">
+                                                                <div class="row pb-3">
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                        <span>ID</span>
+                                                                    </div>
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                        <input type="text" class="form-control" name="id" readonly>
+                                                                    </div>
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                    </div>
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm align-self-center">
+                                                                        <span>width</span>
+                                                                    </div>
+                                                                    <div class="col-sm align-self-center">
+                                                                        <input type="text" id="Config_Resize_Width" onkeyup="make_id(this);" class="form-control" name="width" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                                                                    </div>
+                                                                    <div class="col-sm align-self-center">
+                                                                        <span>height</span>
+                                                                    </div>
+                                                                    <div class="col-sm align-self-center">
+                                                                        <input type="text" id="Config_Resize_Height" onkeyup="make_id(this);" class="form-control" name="height" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <div class="container_fluid pt-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="d-inline">
+                                                <a onclick="addRow()" class="btn btn-primary btn-user ">
+                                                    추가하기
+                                                </a>
+                                            </div>
+                                            <div class="d-inline">
+                                                <a data-toggle="modal" data-target="#Configure_Resize_List" class="btn btn-primary btn-user ">
+                                                    불러오기
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button onclick="return chk_GroupId()" class="btn btn-dark btn-user">저장하기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Configure_Resize_Add 팝업 창 -->
+                <!-- Configure_Resize_Update 팝업 창 -->
+                <form id="Configure_Resize_Update" th:if="${group_id}!=null" action="resize" method="post">
+                    <input type="hidden" th:if="${fix}!=1" value="update" name="query">
+                    <input type="hidden" th:if="${fix}==1" value="insert" name="query">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="text-right">
+                                    <button type="button" class="close" onclick="location.href='resize'"><span aria-hidden="true"><h2>×</h2></span>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="form-inline" role="form">
+                                            <li>그룹 ID</li>&nbsp;&nbsp;
+                                            <input type="text" class="form-control" th:if="${fix}!=1" th:value="${group_id}" name="group_id" readonly>
+                                            <input type="text" class="form-control" th:if="${fix}==1" th:value="${group_id}+'_1'" name="group_id" >
+                                            <input type="hidden" name="create_time" th:value="${getResizeByGroupId.get(0).getCreate_time()}">
+                                            <input type="hidden" name="selected" th:if="${fix}!=1" th:value="${getResizeByGroupId.get(0).getSelected()}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="Resize_Card">
+                                    <div class="index pb-3" th:each="m, i : ${getResizeByGroupId}">
+                                        <div class="row">
+                                            <div class="w-50">
+                                                <div class="border">
+                                                    <div class="container_fluid">
+                                                        <div class="row">
+                                                            <div class="col text-right pt-2 mr-2">
+                                                                <button type="button" class="close" onclick="delRow(this)"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group pt-3">
+                                                        <div class="form-inline" role="form">
+                                                            <div class="container">
+                                                                <div class="row pb-3">
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                        <span>ID</span>
+                                                                    </div>
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                        <input type="text" class="form-control" th:value="${m.getId()}" name="id" readonly>
+                                                                    </div>
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                    </div>
+                                                                    <div class="col-sm-3 align-self-center">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm align-self-center">
+                                                                        <span>width</span>
+                                                                    </div>
+                                                                    <div class="col-sm align-self-center">
+                                                                        <input type="text" class="form-control" onkeyup="make_id(this);" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" th:value="${m.getWidth()}" name="width" required>
+                                                                    </div>
+                                                                    <div class="col-sm align-self-center">
+                                                                        <span>height</span>
+                                                                    </div>
+                                                                    <div class="col-sm align-self-center">
+                                                                        <input type="text" class="form-control" onkeyup="make_id(this);" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" th:value="${m.getHeight()}" name="height" required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <div class="container_fluid pt-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="d-inline">
+                                                <a onclick="addRow()" class="btn btn-primary btn-user ">
+                                                    추가하기
+                                                </a>
+                                            </div>
+                                            <div class="d-inline">
+                                                <a th:href="@{resize/delete(group_id=${group_id})}" class="btn btn-primary btn-user" onclick="return chkDelete()">
+                                                    삭제하기
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button type="submit" onclick="return chk_Value()" class="btn btn-dark btn-user">저장하기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Configure_Resize 팝업 창 -->
+            </div>
+            <!-- / 대쉬보드 - Configure_Main-->
+        </div>
+        <!-- End of Main Content -->
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+
+
+<!-- Configure_Resize_List 팝업 창 -->
+<div id="Configure_Resize_List" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <li>
+                    List
+                </li>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="text-center btn-block">
+                            <div th:each="m, i : ${getListGroupConcat}" class="pb-1">
+                                <button class=" btn-light btn-block btn" th:text="${m.getGroup_id()}" th:onclick="|location.href='@{resize(group_id=${m.getGroup_id()},fix='1')}'|"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Configure_Resize_List 팝업 창 -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+<script defer src="/js/config/resize.js"></script>
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+</body>
+
+<script>
+    history.pushState(null, null, 'resize');
+    window.onpopstate = function(event) {
+        history.go(1);
+    };
+</script>
+
+
+</html>

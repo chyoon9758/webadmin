@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>U+ Next MultiView - Configure</title>
+  <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column bg-white">
+    <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+    <div th:replace="config/config_header.html :: config_header"></div>
+    <!-- Main Content -->
+    <div id="content">
+      <!-- 대쉬보드 - Configure_Main-->
+      <div id="DashBoard_Configure">
+        <!-- Configure - Packager -->
+        <div id="Configure_Packager" th:if="${group_id}==null">
+          <div class="row">
+            <div class="col-lg-12 mb-4">
+              <div class="card shadow mb-4">
+                <div class="card-body">
+                  <div class="table-responsive" >
+                    <table class="table table-bordered text-center table-hover">
+                      <colgroup>
+                        <col style="width:20%">
+                        <col style="width:20%">
+                        <col style="width:20%">
+                        <col style="width:20%">
+                        <col style="width:20%">
+                      </colgroup>
+                      <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>DRM</th>
+                        <th>dash</th>
+                        <th>hls</th>
+                        <th>사용 여부</th>
+                      </tr>
+                      </thead>
+                      <tbody th:if="${getListAll!=null}">
+                      <tr class="text-center" th:each="m, i : ${getListAll}" th:onclick="|location.href='@{packager(group_id=${m.getGroup_id()})}'|">
+                        <td th:text="${m.getGroup_id()}"></td>
+                        <td th:text="${m.getEnable()}"></td>
+                        <td th:text="${m.getDash()}"></td>
+                        <td th:text="${m.getHls()}"></td>
+                        <td><span th:if="${m.selected}==1">사용 중</span></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-primary" style="width:100px;" onclick="Config_Packager_Add_On()">추가하기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- / Configure - Packager-->
+        <!-- Configure - Packager_Add -->
+        <form id="Configure_Packager_Add" th:if="${group_id}==null" name="Insert_Packager" style="display:none" action="packager" method="post">
+          <input type="hidden" value="insert" name="query">
+          <div class="col-lg-12 mb-4">
+            <div class="card shadow mb-4">
+              <div class="card-body">
+                <div class="text-right">
+                    <button type="button" class="close" onclick="location.href='packager'"><span aria-hidden="true"><h2>×</h2></span>
+                  </button>
+                </div>
+                <div class="row">
+                  <div class="form-group pt-3">
+                    <div class="form-inline" role="form">
+                      <div class="container">
+
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <span>ID</span>
+                          </div>
+                          <div class="col-2 align-self-center">
+                            <input type="text" id="Config_Packager_Id" class="form-control" name="group_id" required>
+                            <input type="hidden" name="id" th:value="${getListAll.size()+1}">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-1 font-weight-bold">
+                      <span>Segmenter</span>
+                    </div>
+                    <div class="col">
+                      <hr>
+                    </div>
+                  </div>
+
+                  <div class="container-fluid">
+
+                    <div class="row">
+                      <div class="col-1 font-weight-bold">
+                        <span>DRM</span>
+                      </div>
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-1">
+                        <span>enable</span>
+                      </div>
+                      <div class="col-1 align-self-center">
+                        <select class="form-select form-select-sm" name="enable" required>
+                          <option value="off" selected>off</option>
+                          <option value="on">on</option>
+                        </select>
+                      </div>
+                      <div class="col"></div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>kms url</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" id="Config_Packager_Kms_Url" class="form-control" name="kms_url" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>kms token</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" id="Config_Packager_Kms_Tokken" class="form-control" name="kms_token" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>content id</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" id="Config_Packager_Content_Id" class="form-control" name="content_id" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>service</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Service" class="form-control" name="service" required>
+                      </div>
+                      <div class="col-1">
+                        <span>container</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Container" class="form-control" name="container" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>mpd_path</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Mpd_Path" class="form-control" name="mpd_path" required>
+                      </div>
+                      <div class="col-1">
+                        <span>mpd_name</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Mpd_Name" class="form-control" name="mpd_name" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>segment path prefix</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Segment_Path" class="form-control" name="segment_path_prefix" required>
+                      </div>
+                      <div class="col"></div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>m3u8 path</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_M3u8_Path" class="form-control" name="m3u8_path" required>
+                      </div>
+                      <div class="col-1">
+                        <span>m3u8 name</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_M3u8_Name" class="form-control" name="m3u8_name" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>segment duration</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Segment_Duration" class="form-control" name="segment_duration" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                      </div>
+                      <div class="col-1">
+                        <span>window</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Window" class="form-control" name="window" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>minupdate period</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Minupdate_Period" class="form-control" name="minupdate_period" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                      </div>
+                      <div class="col-1">
+                        <span>preserved segments</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Preserved_Segments" class="form-control" name="preserved_segments" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-5">
+                      <div class="col-1 align-self-center font-weight-bold">
+                        <span>manifest generator</span>
+                      </div>
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-2 align-self-center">
+                        <div class="form-group">
+                          <div class="form-inline" role="form">
+                            <span>dash:</span>
+                            <select class="form-select form-select-sm form-control" name="dash" required>
+                              <option value="no" selected>no</option>
+                              <option value="yes">yes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-2 align-self-center">
+                        <div class="form-group">
+                          <div class="form-inline" role="form">
+                            <span>hls:</span>
+                            <select class="form-select form-select-sm form-control" name="hls" required>
+                              <option value="no" selected>no</option>
+                              <option value="yes">yes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col"></div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center font-weight-bold">
+                        <span>publishing info</span>
+                      </div>
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center">
+                        <span>name</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Name" class="form-control" value="" name="name">
+                      </div>
+                      <div class="col-1 align-self-center">
+                        <span>Access Key</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Access_Key" class="form-control" name="accessKey" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center">
+                        <span>endpoint</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" id="Config_Packager_Endpoint" class="form-control" name="endpoint" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center">
+                        <span>Secret Key</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Secret_Key" class="form-control" name="secretKey" required>
+                      </div>
+                      <div class="col-1 align-self-center">
+                        <span>region</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" id="Config_Packager_Region" class="form-control" name="region" required>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /  segmenter_container  -->
+                </div>
+                <!-- /  card_container  -->
+
+                <div class="row pt-4">
+                  <div class="col">
+                    <div class="d-inline">
+                      <a  data-toggle="modal" data-target="#Configure_Packager_List" class="btn btn-primary btn-user">
+                        불러오기
+                      </a>
+                    </div>
+                  </div>
+                  <div class="col text-right">
+                    <button onclick="return chk_GroupId()" class="btn btn-dark btn-user">저장하기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!-- / Configure - Packager_Add-->
+        <!-- Configure - Packager_Update -->
+        <form id="Configure_Packager_Update" th:if="${group_id}!=null" action="packager" method="post">
+          <input type="hidden" th:if="${fix}!=1" value="update" name="query">
+          <input type="hidden" th:if="${fix}==1" value="insert" name="query">
+          <div class="col-lg-12 mb-4">
+            <div class="card shadow mb-4">
+              <div class="card-body">
+                <div class="text-right">
+                  <button type="button" class="close" onclick="location.href='packager'"><span aria-hidden="true"><h2>×</h2></span>
+                  </button>
+                </div>
+                <div class="row">
+                  <div class="form-group pt-3">
+                    <div class="form-inline" role="form">
+                      <div class="container">
+
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <span>ID</span>
+                          </div>
+                          <div class="col-2 align-self-center">
+                            <input type="text" class="form-control" th:if="${fix}!=1" th:value="${group_id}" name="group_id" required readonly>
+                            <input type="text" class="form-control" th:if="${fix}==1" th:value="${group_id}+'_1'" name="group_id" required>
+                            <input type="hidden" name="id" th:if="${fix}==1" th:value="${getListAll.size()+1}">
+                            <input type="hidden" th:value="${getPackagerByGroupId.selected}" th:if="${fix}!=1" name="selected">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-1 font-weight-bold">
+                      <span>Segmenter</span>
+                    </div>
+                    <div class="col">
+                      <hr>
+                    </div>
+                  </div>
+
+                  <div class="container-fluid">
+
+                    <div class="row">
+                      <div class="col-1 font-weight-bold">
+                        <span>DRM</span>
+                      </div>
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-1">
+                        <span>enable</span>
+                      </div>
+                      <div class="col-1 align-self-center">
+                        <select class="form-select form-select-sm" name="enable" required>
+                          <option value="off" th:selected="${#strings.equals(getPackagerByGroupId.getEnable(),'off')}">off</option>
+                          <option value="on" th:selected="${#strings.equals(getPackagerByGroupId.getEnable(),'on')}">on</option>
+                        </select>
+                      </div>
+                      <div class="col"></div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>kms url</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getKms_url()}" name="kms_url" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>kms token</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getKms_token()}" name="kms_token" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>content id</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getContent_id}" name="content_id" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>service</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getService()}" name="service" required>
+                      </div>
+                      <div class="col-1">
+                        <span>container</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getContainer()}" name="container" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>mpd_path</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getMpd_path()}" name="mpd_path" required>
+                      </div>
+                      <div class="col-1">
+                        <span>mpd_name</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getMpd_name()}" name="mpd_name" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>segment path prefix</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getSegment_path_prefix()}" name="segment_path_prefix" required>
+                      </div>
+                      <div class="col"></div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>m3u8 path</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getM3u8_path()}" name="m3u8_path" required>
+                      </div>
+                      <div class="col-1">
+                        <span>m3u8 name</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getM3u8_name()}" name="m3u8_name" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>segment duration</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getSegment_duration()}" name="segment_duration" required>
+                      </div>
+                      <div class="col-1">
+                        <span>window</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getWindow()}" name="window" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1">
+                        <span>minupdate period</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getMinupdate_period()}" name="minupdate_period" required>
+                      </div>
+                      <div class="col-1">
+                        <span>preserved segments</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getPreserved_segments()}" name="preserved_segments" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-5">
+                      <div class="col-1 align-self-center font-weight-bold">
+                        <span>manifest generator</span>
+                      </div>
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-2 align-self-center">
+                        <div class="form-group">
+                          <div class="form-inline" role="form">
+                            <span>dash:</span>
+                            <select class="form-select form-select-sm form-control" name="dash" required>
+                              <option value="no" th:selected="${getPackagerByGroupId.getDash().equals('no')}">no</option>
+                              <option value="yes" th:selected="${getPackagerByGroupId.getDash().equals('yes')}">yes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-2 align-self-center">
+                        <div class="form-group">
+                          <div class="form-inline" role="form">
+                            <span>hls:</span>
+                            <select class="form-select form-select-sm form-control" name="hls" required>
+                              <option value="no" th:selected="${getPackagerByGroupId.getHls().equals('no')}">no</option>
+                              <option value="yes" th:selected="${getPackagerByGroupId.getHls().equals('yes')}">yes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col"></div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center font-weight-bold">
+                        <span>publishing info</span>
+                      </div>
+                      <div class="col">
+                        <hr>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center">
+                        <span>name</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getName()}" value="" name="name" readonly>
+                      </div>
+                      <div class="col-1 align-self-center">
+                        <span>Access Key</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getAccessKey()}" name="accessKey" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center">
+                        <span>endpoint</span>
+                      </div>
+                      <div class="col align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getEndpoint()}" name="endpoint" required>
+                      </div>
+                    </div>
+
+                    <div class="row pt-2">
+                      <div class="col-1 align-self-center">
+                        <span>Secret Key</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getSecretKey()}" name="secretKey" required>
+                      </div>
+                      <div class="col-1 align-self-center">
+                        <span>region</span>
+                      </div>
+                      <div class="col-5 align-self-center">
+                        <input type="text" class="form-control" th:value="${getPackagerByGroupId.getRegion()}" name="region" required>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /  segmenter_container  -->
+                </div>
+                <!-- /  card_container  -->
+
+                <div class="row pt-4">
+                  <div class="col">
+                    <div class="d-inline">
+                      <a th:href="@{packager/delete(group_id=${group_id})}" class="btn btn-primary btn-user" onclick="return chkDelete()">
+                        삭제하기
+                      </a>
+                    </div>
+                  </div>
+                  <div class="col text-right">
+                    <button type="submit" onclick="return chk_Value()" class="btn btn-dark btn-user">저장하기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!-- / Configure - Packager_Update-->
+      </div>
+      <!-- / 대쉬보드 - Configure_Main-->
+    </div>
+    <!-- End of Main Content -->
+  </div>
+  <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Configure_Packager_List 팝업 창 -->
+<div id="Configure_Packager_List" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <li>
+          List
+        </li>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="text-center btn-block">
+              <div th:each="m, i : ${getListAll}" class="pb-1">
+                <button class=" btn-light btn-block btn" th:text="${m.getGroup_id()}" th:onclick="|location.href='@{packager(group_id=${m.getGroup_id()},fix='1')}'|"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Configure_Packager_List 팝업 창 -->
+<script defer src="/js/config/packager.js"></script>
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+</body>
+
+<script>
+  history.pushState(null, null, 'packager');
+  window.onpopstate = function(event) {
+    history.go(1);
+  };
+
+</script>
+
+
+</html>

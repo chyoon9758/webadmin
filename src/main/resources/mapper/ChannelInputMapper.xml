@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.admin.DAO.ChannelInputDAO">
+    <select id="getListAll" resultType="com.web.admin.DTO.ChannelInputDTO">
+        select * from next_multi_view.TEST_CHANNEL_INPUT;
+    </select>
+    <select id="getListGroupConcat" resultType="com.web.admin.DTO.ChannelInputConcatDTO">
+        select selected, group_id, group_concat(id order by id separator ' / ') id_concat from next_multi_view.TEST_CHANNEL_INPUT group by group_id, create_time,selected order by create_time desc;
+    </select>
+    <select id="getInputByGroupId" resultType="com.web.admin.DTO.ChannelInputDTO">
+        SELECT * FROM next_multi_view.TEST_CHANNEL_INPUT WHERE group_id = #{group_id};
+    </select>
+    <select id="getInputListAPI" resultType="com.web.admin.DTO.api.transcodingStandby.uplusIdolliveConfig.transConfigs.InputListAPI">
+        SELECT id, address, input_interface, broadcasted FROM next_multi_view.TEST_CHANNEL_INPUT WHERE group_id = #{group_id};
+    </select>
+    <delete id="deleteListByGroupId">
+        DELETE FROM next_multi_view.TEST_CHANNEL_INPUT WHERE group_id = #{group_id};
+    </delete>
+    <insert id="insertList">
+        INSERT INTO next_multi_view.TEST_CHANNEL_INPUT VALUES
+        <foreach collection="channelInputDTOList" item="list" separator=",">
+            (#{list.group_id}, #{list.id}, #{list.address}, #{list.input_interface}, #{list.broadcasted}<if test="now">, now()</if><if test="!now">, #{list.create_time}</if>, #{list.selected})
+        </foreach>
+    </insert>
+</mapper>

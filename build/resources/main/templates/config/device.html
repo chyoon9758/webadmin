@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>U+ Next MultiView - Configure</title>
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column bg-white">
+        <!-- Main Content -->
+        <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+        <div th:replace="config/config_header.html :: config_header"></div>
+        <div id="content">
+            <!-- Configure - Device-->
+            <div id="Configure_Device" th:if="${name}==null">
+                <div class="row">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="table-responsive" >
+                                    <table class="table table-bordered text-center table-hover">
+                                        <colgroup>
+                                            <col style="width:20%">
+                                            <col style="width:40%">
+                                            <col style="width:40%">
+                                        </colgroup>
+                                        <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Name</th>
+                                            <th>Role</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody th:if="${devicelist!=null}">
+                                        <tr class="text-center cursor-pointer" th:each="list, i:${devicelist}" th:onclick="|location.href='@{/dashboard/config/device(name = ${list.name})}'|">
+                                            <td th:text="${#lists.size(devicelist)-i.index}"></td>
+                                            <td th:text="${list.name}"></td>
+                                            <td th:text="${list.role}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary" th:if="${#lists.size(devicelist)<1}" onclick="Config_Device_Add_On()">추가하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / Configure - Device-->
+
+            <!-- Configure_Device 팝업 창 -->
+            <form id="Configure_Device_Add" name="Insert_Device"  style="display: none;" th:if="${name}==null" th:action="@{/dashboard/config/device/insert.do}" method="post">
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <div class="text-right">
+                                <button type="button" class="close"><span aria-hidden="true" onclick="location.href='device'"><h2>×</h2></span>
+                                </button>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="form-inline">
+                                        Name&nbsp;&nbsp;
+                                        <input type="text" name="name" class="form-control" required>
+                                        <input type="hidden" name="create_time" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="w-50">
+                                <div class="border">
+                                    <div class="container">
+                                        <div class="form-group pt-3">
+                                            <div class="form-inline">
+                                                <div class="col-3">
+                                                    <span>IP Address</span>
+                                                </div>
+                                                <div class="col">
+                                                    <input type="text" name="ip" class="form-control w-100">
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="form-inline">
+                                                <div class="col-3">
+                                                    <span>Role</span>
+                                                </div>
+                                                <div class="col">
+                                                    <select class="form-select form-select-sm form-control w-100" th:name="role">
+                                                        <option value="선택"> 선택 </option>
+                                                        <option th:each="list : ${roleslist}" th:value="${list.id}" th:utext="${list.id}"></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="text-right p-2">
+                                <button onclick="return chk_Insert_Device()" class="btn btn-dark btn-user ">
+                                    저장하기
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+            <!-- Configure_Device 팝업 창 -->
+
+            <!-- Configure_Device_Call 팝업 창 -->
+            <form name="Update_Device" th:if="${name}!=null" th:action="@{/dashboard/config/device/update.do}" method="post">
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <div class="text-right">
+                                <button type="button" class="close"><span aria-hidden="true" onclick="location.href='device'"><h2>×</h2></span>
+                                </button>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="form-inline">
+                                        Name&nbsp;&nbsp;
+                                        <input type="text" th:value="${selectdevice.name}" name="name" class="form-control" required >
+                                        <input type="hidden" th:value="${selectdevice.create_time}" name="create_time" class="form-control">
+                                        <input type="hidden" th:value="${selectdevice.name}" name="origin_name" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="w-50">
+                                    <div class="border">
+                                        <div class="container">
+                                            <div class="form-group pt-3">
+                                                <div class="form-inline">
+                                                    <div class="col-3">
+                                                        <span>IP Address</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input type="text" th:value="${selectdevice.ip}" name="ip" class="form-control w-100" required>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="form-inline">
+                                                    <div class="col-3">
+                                                        <span>Role</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-select form-select-sm form-control w-100" th:name="role">
+                                                            <option value="선택"> 선택 </option>
+                                                            <option th:each="list : ${roleslist}" th:selected="${list.id}==${selectdevice.role}" th:value="${list.id}" th:utext="${list.id}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container_fluid pt-3">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="d-inline">
+                                            <button type="submit" formaction="/dashboard/config/device/delete.do" onclick="if(!confirm('삭제하시면 복구할 수 없습니다. \n정말로 삭제하시겠습니까?')){return false;}" class="btn btn-primary btn-user ">
+                                                삭제하기
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col text-right">
+                                        <button onclick="return chk_Insert_Device(1)" class="btn btn-dark btn-user">저장하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+            <!-- Configure_Device_Call 팝업 창 -->
+
+            </div>
+            <hr class="mt-2 mb-3"/>
+            <!-- / 대쉬보드 - Configure_Main-->
+        </div>
+        <!-- End of Main Content -->
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+<!-- /Configure_Device_List 팝업 창 -->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script th:inline="javascript" defer src="/js/config/device.js"></script>
+</body>
+
+<script>
+    history.pushState(null, null, 'device');
+    window.onpopstate = function(event) {
+        history.go(1);
+    };
+</script>
+
+
+</html>

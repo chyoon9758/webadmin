@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.admin.DAO.UserLogDAO">
+
+    <select id="getListAll" resultType="com.web.admin.DTO.UserLogDTO">
+        SELECT * FROM next_multi_view.TEST_USER_ACTION_LIST order by date desc LIMIT #{userlogcnt};
+    </select>
+
+    <insert id="insertUserLog" parameterType="com.web.admin.DTO.UserLogDTO">
+        insert into next_multi_view.TEST_USER_ACTION_LIST(user, logString, date)
+        values
+            (
+            #{user},
+            #{logString},
+            NOW()
+            );
+    </insert>
+
+    <delete id="deleteUserLog">
+        DELETE FROM next_multi_view.TEST_USER_ACTION_LIST WHERE idx NOT IN (SELECT idx FROM(SELECT idx FROM TEST_USER_ACTION_LIST ORDER BY date DESC LIMIT #{userlogcnt}) a);
+    </delete>
+</mapper>

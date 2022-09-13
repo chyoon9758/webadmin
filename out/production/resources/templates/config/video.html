@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>U+ Next MultiView - Configure</title>
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column bg-white">
+        <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+        <div th:replace="config/config_header.html :: config_header"></div>
+        <!-- Main Content -->
+        <div id="content">
+            <!-- 대쉬보드 - Configure_Main-->
+            <div id="DashBoard_Configure">
+                <!-- Configure - Video-->
+                <div id="Configure_Video" th:if="${group_id==null}">
+                    <div class="row">
+                        <div class="col-lg-12 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive" >
+                                        <table class="table table-bordered text-center table-hover">
+                                            <colgroup>
+                                                <col style="width:20%">
+                                                <col style="width:60%">
+                                                <col style="width:20%">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Encoder List</th>
+                                                <th>사용 여부</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody th:if="${getListGroupConcat!=null}">
+                                            <tr class="text-center cursor-pointer" th:each="list, i:${getListGroupConcat}" th:onclick="|location.href='@{/dashboard/config/video(group_id = ${list.group_id})}'|">
+                                                <td th:text="${list.group_id}"></td>
+                                                <td th:text="${list.id_concat}"></td>
+                                                <td class="border"><span th:if="${list.selected}==1">사용 중</span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" onclick="Config_Video_Add_On()">추가하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / Configure - Video-->
+
+                <!-- Configure_Video 팝업 창 -->
+                <div id="Configure_Video_Add" th:if="${group_id}==null" style="display: none">
+                    <form name="Insert_Video" th:action="@{/dashboard/config/video/insert.do}" method="post">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="text-right">
+                                    <button type="button" class="close"><span aria-hidden="true" onclick="location.href='video'"><h2>×</h2></span>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="form-inline">
+                                            <li>Group ID</li>&nbsp;&nbsp;
+                                            <input type="text" id="Config_Video_Preset_Id" class="form-control" required th:name="group_id">
+                                            <input type="hidden" class="form-control" th:name="create_time">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="Video_Card">
+                                    <div class="index pb-3">
+                                        <div class="row">
+                                            <div class="w-75">
+                                                <div class="border">
+                                                    <div class="container_fluid">
+                                                        <div class="row">
+                                                            <div class="col text-right pt-2 mr-2">
+                                                                <button type="button" class="close" onclick="delRow(this)"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group pt-3">
+                                                        <div class="form-inline">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-1 align-self-center">
+                                                                        <span>ID</span>
+                                                                    </div>
+                                                                    <div class="col-3 align-self-center">
+                                                                        <input type="text" class="form-control" required th:name="id">
+                                                                    </div>
+                                                                    <div class="col-1 align-self-center">
+                                                                        <span>GOP</span>
+                                                                    </div>
+                                                                    <div class="col-3 align-self-center">
+                                                                        <select class="form-select form-select-sm form-control" style="width:202px;" required th:name="iframe_interval">
+                                                                            <option value="15">15</option>
+                                                                            <option value="30" selected>30</option>
+                                                                            <option value="60">60</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-1 align-self-center">
+                                                                        <span>Bitrate</span>
+                                                                    </div>
+                                                                    <div class="col-3 align-self-center">
+                                                                        <input type="text" class="form-control" onkeypress="inNumber();" required th:name="bitrate">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>Codec</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <input type="text" class="form-control" required th:name="codec" th:value="h264" readonly><!--스크립트에서 막기-->
+                                                                        </div>
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>FPS</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <input type="text" class="form-control" required th:name="fps" th:value="29.97" readonly><!--스크립트에서 막기-->
+                                                                        </div>
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>Profile</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <select class="form-select form-select-sm form-control" style="width:202px;" required th:name="profile">
+                                                                                <option value="Base">Base</option>
+                                                                                <option value="Main">Main</option>
+                                                                                <option value="High">High</option>
+                                                                                <option value="Auto" selected>Auto</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>Width X height</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <input type="text" class="form-control w-25" onkeypress="inNumber();" required th:name="width">X
+                                                                            <input type="text" class="form-control w-25" onkeypress="inNumber();" required th:name="height">
+                                                                        </div>
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>Level</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <input type="text" class="form-control" required th:name="level">
+                                                                        </div>
+                                                                        <div class="col-1 align-self-center">
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+
+                                <div class="container_fluid pt-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="d-inline">
+                                                <a onclick="addRow(this)" class="btn btn-primary btn-user ">
+                                                    추가하기
+                                                </a>
+                                            </div>
+                                            <div class="d-inline">
+                                                <button class="btn btn-primary btn-user display-none">
+                                                    삭제하기
+                                                </button>
+                                            </div>
+                                            <div class="d-inline">
+                                                <a data-toggle="modal" data-target="#Configure_Video_List" class="btn btn-primary btn-user ">
+                                                    불러오기
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button onclick="return chk_GroupId()" class="btn btn-dark btn-user">
+                                                저장하기
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                <!-- Configure_Video 팝업 창 -->
+
+                <!-- Configure_Video_Call 팝업 창 -->
+                <form name="Update_Video" th:if="${group_id}!=null" th:action="@{/dashboard/config/video/update.do}" method="post">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="text-right">
+                                    <button type="button" class="close"><span aria-hidden="true" onclick="location.href='video'"><h2>×</h2></span>
+                                    </button>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="form-inline">
+                                            <li>Group ID</li>&nbsp;&nbsp;
+                                            <input type="text" class="form-control" th:if="${fix}!=1" readonly th:value="${group_id}" required th:name="group_id" >
+                                            <input type="text" class="form-control" th:if="${fix}==1" th:value="${group_id}+'_1'" required th:name="group_id" >
+                                            <input type="hidden" th:value="${data.create_time}" th:name="create_time" >
+                                            <input type="hidden" th:value="${data.selected}" th:name="selected">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="Video_Card">
+                                    <div class="index pb-3" th:each="list : ${getInputByPresetId}">
+                                        <div class="row">
+                                            <div class="w-75">
+                                                <div class="border">
+                                                    <div class="container_fluid">
+                                                        <div class="row">
+                                                            <div class="col text-right pt-2 mr-2">
+                                                                <button type="button" class="close" onclick="delRow(this)"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>ID</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <input type="text" class="form-control" th:value="${list.id}" required th:name="id">
+                                                                        </div>
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>GOP</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <select class="form-select form-select-sm form-control" required th:name="iframe_interval" style="width:202px;">
+                                                                                <option value="15" th:selected="${list.iframe_interval==15}">15</option>
+                                                                                <option value="30" th:selected="${list.iframe_interval==30}">30</option>
+                                                                                <option value="60" th:selected="${list.iframe_interval==60}">60</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-1 align-self-center">
+                                                                            <span>Bitrate</span>
+                                                                        </div>
+                                                                        <div class="col-3 align-self-center">
+                                                                            <input type="text" class="form-control" onkeypress="inNumber();" th:value="${list.bitrate}" required th:name="bitrate">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group pt-3">
+                                                                <div class="form-inline">
+                                                                    <div class="container">
+                                                                        <div class="row">
+                                                                            <div class="col-1 align-self-center">
+                                                                                <span>Codec</span>
+                                                                            </div>
+                                                                            <div class="col-3 align-self-center">
+                                                                                <input type="text" class="form-control" required th:name="codec" th:value="${list.codec}" readonly><!--스크립트에서 막기-->
+                                                                            </div>
+                                                                            <div class="col-1 align-self-center">
+                                                                                <span>FPS</span>
+                                                                            </div>
+                                                                            <div class="col-3 align-self-center">
+                                                                                <input type="text" class="form-control" required th:name="fps" th:value="${list.fps}" readonly><!--스크립트에서 막기-->
+                                                                            </div>
+                                                                            <div class="col-1 align-self-center">
+                                                                                <span>Profile</span>
+                                                                            </div>
+                                                                            <div class="col-3 align-self-center">
+                                                                                <select class="form-select form-select-sm form-control" required th:name="profile" style="width:202px;">
+                                                                                    <option value="Base" th:selected="${list.profile=='Base'}">Base</option>
+                                                                                    <option value="Main" th:selected="${list.profile=='Main'}">Main</option>
+                                                                                    <option value="High" th:selected="${list.profile=='High'}">High</option>
+                                                                                    <option value="Auto" th:selected="${list.profile=='Auto'}">Auto</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group pt-3">
+                                                                <div class="form-inline">
+                                                                    <div class="container">
+                                                                        <div class="row">
+                                                                            <div class="col-1 align-self-center">
+                                                                                <span>Width X height</span>
+                                                                            </div>
+                                                                            <div class="col-3 align-self-center">
+                                                                                <input type="text" class="form-control w-25" onkeypress="inNumber();" required th:name="width" th:value="${list.width}" >X
+                                                                                <input type="text" class="form-control w-25" onkeypress="inNumber();" required th:name="height" th:value="${list.height}">
+                                                                            </div>
+                                                                            <div class="col-1 align-self-center">
+                                                                                <span>Level</span>
+                                                                            </div>
+                                                                            <div class="col-3 align-self-center">
+                                                                                <input type="text" class="form-control" required th:name="level" th:value="${list.level}">
+                                                                            </div>
+                                                                            <div class="col-1 align-self-center">
+                                                                            </div>
+                                                                            <div class="col-3 align-self-center">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+
+                                <div class="container_fluid pt-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="d-inline">
+                                                <a onclick="addRow(this)" class="btn btn-primary btn-user ">
+                                                    추가하기
+                                                </a>
+                                            </div>
+                                            <div class="d-inline">
+                                                <button type="submit" formaction="/dashboard/config/video/delete.do" onclick="return chkDelete()" class="btn btn-primary btn-user ">
+                                                    삭제하기
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button onclick="return chk_Value()" class="btn btn-dark btn-user" th:if="${fix}!=1">
+                                                저장하기
+                                            </button>
+                                            <button onclick="return chk_GroupId(1)" formaction="/dashboard/config/video/insert.do" th:if="${fix}==1" class="btn btn-dark btn-user">
+                                                저장하기
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Configure_Video_Call 팝업 창 -->
+
+            </div>
+            <!-- / 대쉬보드 - Configure_Main-->
+        </div>
+        <!-- End of Main Content -->
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Configure_Video_List 팝업 창 -->
+<div id="Configure_Video_List" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <li>
+                    List
+                </li>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="text-center btn-block">
+                            <div th:each="list : ${getListGroupConcat}" class="pb-1">
+                                <a class="btn btn-light btn-block text-decoration-none" th:text="${list.group_id}" th:href="@{/dashboard/config/video(group_id = ${list.group_id},fix='1')}"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Configure_Video_List 팝업 창 -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+<script th:inline="javascript" defer src="/js/config/video.js"></script>
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+</body>
+
+<script>
+    history.pushState(null, null, 'video');
+    window.onpopstate = function(event) {
+        history.go(1);
+    };
+</script>
+
+
+</html>

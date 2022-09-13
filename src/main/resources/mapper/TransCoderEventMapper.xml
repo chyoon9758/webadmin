@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.admin.DAO.api.TransCoderEventDAO">
+
+    <select id="getListAll" resultType="com.web.admin.DTO.api.notifyingEvent.IdolLiveEventAPI">
+        SELECT * FROM next_multi_view.TEST_EVENT_LIST order by idx desc limit #{transcoderlogcnt};
+    </select>
+    <select id="getStatus" resultType="com.web.admin.DTO.api.notifyingEvent.IdolLiveEventAPI">
+        SELECT * FROM next_multi_view.TEST_EVENT_LIST order by idx desc limit 1;
+    </select>
+
+    <insert id="insertTransCoderEvent" parameterType="com.web.admin.DTO.api.notifyingEvent.IdolLiveEventAPI">
+        insert into next_multi_view.TEST_EVENT_LIST(status,messageLevel,message,errorcode,errorstring,errorcode2,errorstring2,elapsedTime,date)
+        values
+            (
+                #{status},
+                #{messageLevel},
+                #{message},
+                #{errorCode},
+                #{errorString},
+                #{errorCode2},
+                #{errorString2},
+                #{elapsedTime},
+                NOW()
+            );
+    </insert>
+
+    <delete id="deleteTransCoderLog">
+        DELETE FROM next_multi_view.TEST_EVENT_LIST WHERE idx NOT IN (SELECT idx FROM(SELECT idx FROM TEST_EVENT_LIST ORDER BY date DESC LIMIT #{transcoderlogcnt}) a);
+    </delete>
+</mapper>

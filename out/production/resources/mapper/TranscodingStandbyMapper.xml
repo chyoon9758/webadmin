@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TranscodingStandbyDAO">
+    <select id="getAllEncoder" resultType="EncoderAPI">
+        select encoder from next_multi_view.TEST_MULTIVIEW_PRESET_INFO;
+    </select>
+    <select id="getTransRoleInfo" resultType="TransRoleInfoDTO">
+        select * from next_multi_view.TEST_TRANS_ROLE_INFO where id = #{id};
+    </select>
+    <select id="getPreGridProcessSplitAPI" resultType="PreGridProcessSplitAPI">
+        select * from next_multi_view.TEST_MULTIVIEW_PRESET_INFO where group_id = #{group_id} and preset_group_id = #{preset_group_id};
+    </select>
+    <select id="getMultiviewPresetInfo" resultType="MultiviewPresetInfoDTO">
+        select * from next_multi_view.TEST_MULTIVIEW_PRESET_INFO where group_id = #{group_id} and preset_group_id = #{preset_group_id};
+    </select>
+</mapper>

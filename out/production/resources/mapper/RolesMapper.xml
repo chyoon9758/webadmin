@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RolesDAO">
+
+    <select id="getListRoles" resultType="RolesDTO">
+        select * from next_multi_view.TEST_TRANS_ROLE_INFO order by create_time desc;
+    </select>
+
+    <select id="getSelectRoles" resultType="RolesDTO">
+        select * from next_multi_view.TEST_TRANS_ROLE_INFO where id = #{id};
+    </select>
+
+    <select id="getInput" resultType="java.lang.String">
+        select input_group_id from next_multi_view.TEST_TRANS_ROLE_INFO where id = #{id};
+    </select>
+
+    <select id="getListInput" resultType="ChannelInputDTO">
+        select group_id, create_time, count(group_id) as input_streams from next_multi_view.TEST_CHANNEL_INPUT group by group_id,create_time order by create_time desc;
+    </select>
+
+    <select id="getStreamsInput" resultType="java.lang.String">
+        select count(group_id) as input_streams from next_multi_view.TEST_CHANNEL_INPUT where group_id = #{group_id} group by group_id;
+    </select>
+
+    <select id="getListSourceId" resultType="ChannelInputDTO">
+        select * from next_multi_view.TEST_CHANNEL_INPUT where group_id = #{group_id};
+    </select>
+
+    <select id="getListComposer" resultType="ComposerDTO">
+        select group_id, create_time from next_multi_view.TEST_GRID_COMPOSER_LIST group by group_id,create_time order by create_time desc;
+    </select>
+
+    <select id="getListComposerId" resultType="ComposerDTO">
+        select * from next_multi_view.TEST_GRID_COMPOSER_LIST where group_id = #{group_id};
+    </select>
+
+    <select id="getListPackager" resultType="PackagerDTO">
+        select group_id, create_time from next_multi_view.TEST_PACKAGER_INFO group by group_id,create_time order by create_time desc;
+    </select>
+
+    <select id="getListVideo" resultType="PresetVideoDTO">
+        select group_id, create_time from next_multi_view.TEST_PRESET_VIDEO group by group_id,create_time order by create_time desc;
+    </select>
+
+    <select id="getListVideoId" resultType="PresetVideoDTO">
+        select * from next_multi_view.TEST_PRESET_VIDEO where group_id = #{group_id};
+    </select>
+
+    <select id="getListResizer" resultType="ResizeDTO">
+        select group_id, create_time from next_multi_view.TEST_RESIZE_INFO group by group_id,create_time order by create_time desc;
+    </select>
+
+    <select id="getListResizerId" resultType="ResizeDTO">
+        select * from next_multi_view.TEST_RESIZE_INFO where group_id = #{group_id};
+    </select>
+
+    <select id="getListAbrResizer" resultType="ResizeDTO">
+        select group_id, create_time from next_multi_view.TEST_RESIZE_INFO group by group_id,create_time order by create_time desc;
+    </select>
+
+    <select id="getListAbrResizerId" resultType="ResizeDTO">
+        select * from next_multi_view.TEST_RESIZE_INFO where group_id = #{group_id};
+    </select>
+
+    <select id="getPresetGroupId" resultType="hashmap">
+        SELECT * FROM next_multi_view.TEST_MULTIVIEW_PRESET_INFO WHERE group_id = #{group_id} and id=#{id};
+    </select>
+
+    <insert id="insertRoles" parameterType="RolesDTO">
+        insert into TEST_TRANS_ROLE_INFO
+        values
+            (
+            #{id},
+            #{preset_group_id_1},
+            #{packager_id_1},
+            #{preset_group_id_2},
+            #{packager_id_2},
+            #{input_group_id},
+            #{resize_group_id},
+            #{grid_composer_group_id},
+            #{abr_resizer_group_id},
+            #{encoder_group_id},
+            #{packager_group_id},
+            NOW(),
+            #{input_streams}
+            )AS new
+        ON DUPLICATE KEY UPDATE
+             preset_group_id_1 = new.preset_group_id_1,
+             packager_id_1 = new.packager_id_1,
+             preset_group_id_2 = new.preset_group_id_2,
+             packager_id_2 = new.packager_id_2,
+             input_group_id = new.input_group_id,
+             resize_group_id = new.resize_group_id,
+             grid_composer_group_id = new.grid_composer_group_id,
+             abr_resizer_group_id = new.abr_resizer_group_id,
+             encoder_group_id = new.encoder_group_id,
+             packager_group_id = new.packager_group_id,
+             input_streams = new.input_streams
+            ;
+    </insert>
+    <insert id="insertPresetInfo" parameterType="hashmap">
+        insert into TEST_MULTIVIEW_PRESET_INFO
+        values
+            <foreach collection="list" item="item" separator=",">
+            (
+                #{item.group_id},
+                #{item.preset_group_id},
+                #{item.id},
+                #{item.pre_grid_process_1},
+                #{item.pre_grid_process_2},
+                #{item.pre_grid_process_3},
+                #{item.pre_grid_process_4},
+                #{item.pre_grid_process_5},
+                #{item.pre_grid_process_6},
+                #{item.pre_grid_process_7},
+                #{item.pre_grid_process_8},
+                #{item.pre_grid_process_9},
+                #{item.pre_grid_process_10},
+                #{item.pre_grid_process_11},
+                #{item.grid_composer},
+                #{item.abr_resizer},
+                #{item.encoder}
+            )
+            </foreach>
+        AS new
+        ON DUPLICATE KEY UPDATE
+            preset_group_id = new.preset_group_id,
+            pre_grid_process_1 = new.pre_grid_process_1,
+            pre_grid_process_2 = new.pre_grid_process_2,
+            pre_grid_process_3 = new.pre_grid_process_3,
+            pre_grid_process_4 = new.pre_grid_process_4,
+            pre_grid_process_5 = new.pre_grid_process_5,
+            pre_grid_process_6 = new.pre_grid_process_6,
+            pre_grid_process_7 = new.pre_grid_process_7,
+            pre_grid_process_8 = new.pre_grid_process_8,
+            pre_grid_process_9 = new.pre_grid_process_9,
+            pre_grid_process_10 = new.pre_grid_process_10,
+            pre_grid_process_11 = new.pre_grid_process_11,
+            grid_composer = new.grid_composer,
+            abr_resizer = new.abr_resizer,
+            encoder = new.encoder
+        ;
+    </insert>
+
+    <update id="updateSelectedByInput" parameterType="ChannelInputDTO">
+        UPDATE TEST_CHANNEL_INPUT as a
+        SET
+            a.selected = CASE
+            WHEN a.group_id = any(SELECT input_group_id from TEST_TRANS_ROLE_INFO)
+            THEN 1
+            ELSE 0
+        END
+        WHERE
+            a.selected IN (0,1)
+        ;
+    </update>
+
+    <update id="updateSelectedByResize" parameterType="ResizeDTO">
+        UPDATE TEST_RESIZE_INFO as a
+        SET
+            a.selected = CASE
+                             WHEN a.group_id = any(SELECT resize_group_id from TEST_TRANS_ROLE_INFO)
+                                 THEN 1
+                             WHEN a.group_id = any(SELECT abr_resizer_group_id from TEST_TRANS_ROLE_INFO)
+                                 THEN 1
+                             ELSE 0
+                END
+        WHERE
+            a.selected IN (0,1)
+        ;
+    </update>
+
+    <update id="updateSelectedByComposer" parameterType="ComposerDTO">
+        UPDATE TEST_GRID_COMPOSER_LIST as a
+        SET
+            a.selected = CASE
+                             WHEN a.group_id = any(SELECT grid_composer_group_id from TEST_TRANS_ROLE_INFO)
+                                 THEN 1
+                             ELSE 0
+                END
+        WHERE
+            a.selected IN (0,1)
+        ;
+    </update>
+
+    <update id="updateSelectedByVideo" parameterType="PresetVideoDTO">
+        UPDATE TEST_PRESET_VIDEO as a
+        SET
+            a.selected = CASE
+                             WHEN a.group_id = any(SELECT encoder_group_id from TEST_TRANS_ROLE_INFO)
+                                 THEN 1
+                             ELSE 0
+                END
+        WHERE
+            a.selected IN (0,1)
+        ;
+    </update>
+
+    <update id="updateSelectedByPackager" parameterType="PackagerDTO">
+        UPDATE TEST_PACKAGER_INFO as a
+        SET
+            a.selected = CASE
+                             WHEN a.group_id = any(SELECT packager_id_1 from TEST_TRANS_ROLE_INFO)
+                                 THEN 1
+                             WHEN a.group_id = any(SELECT packager_id_2 from TEST_TRANS_ROLE_INFO)
+                                 THEN 1
+                             ELSE 0
+                END
+        WHERE
+            a.selected IN (0,1)
+        ;
+    </update>
+
+
+
+    <delete id="deleteRolesId">
+        DELETE FROM next_multi_view.TEST_TRANS_ROLE_INFO WHERE id = #{id};
+    </delete>
+    <delete id="deletePresetId">
+        DELETE FROM next_multi_view.TEST_MULTIVIEW_PRESET_INFO WHERE group_id = #{group_id};
+    </delete>
+</mapper>

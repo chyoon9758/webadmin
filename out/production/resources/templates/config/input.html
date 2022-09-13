@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>U+ Next MultiView - Configure</title>
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column bg-white">
+        <div th:replace="monitor/monitor_header.html :: monitor_header"></div>
+        <div th:replace="config/config_header.html :: config_header"></div>
+        <!-- Main Content -->
+        <div id="content">
+            <!-- 대쉬보드 - Configure_Main-->
+            <div id="DashBoard_Configure">
+                <!-- Configure - Input -->
+                <div id="Configure_Input" th:if="${group_id}==null">
+                    <div class="row">
+                        <div class="col-lg-12 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive" >
+                                        <table class="table table-bordered text-center table-hover">
+                                            <colgroup>
+                                                <col style="width:20%">
+                                                <col style="width:60%">
+                                                <col style="width:20%">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Stream List</th>
+                                                <th>사용 여부</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody th:if="${getListGroupConcat!=null}">
+                                            <tr class="text-center" th:each="m, i : ${getListGroupConcat}" th:onclick="|location.href='@{/dashboard/config/input(group_id = ${m.getGroup_id()})}'|">
+                                                <td th:text="${m.getGroup_id()}"></td>
+                                                <td th:text="${m.getId_concat()}"></td>
+                                                <td><span th:if="${m.selected}==1">사용 중</span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" onclick="Config_Input_Add_On()">추가하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / Configure - Input-->
+                <!-- Configure_Input_Add 팝업 창 -->
+                <form id="Configure_Input_Add" name="Insert_Input" th:if="${group_id}==null" style="display: none;" action="input" method="post">
+                    <input type="hidden" value="insert" name="query">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="text-right">
+                                    <button type="button" class="close"><span aria-hidden="true" onclick="location.href='input'"><h2>×</h2></span>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="form-inline" role="form">
+                                            <li>Input ID</li>
+                                            <input type="hidden" name="create_time">
+                                            <input type="hidden" name="selected" value="0">
+                                            <input type="text" id="Config_Video_Input_Id" class="form-control" name="group_id" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="Input_Card">
+                                    <div class="index pb-3">
+                                        <div class="row">
+                                            <div class="w-50">
+                                                <div class="border">
+                                                    <div class="container_fluid">
+                                                        <div class="row">
+                                                            <div class="col text-right pt-2 mr-2">
+                                                                <button type="button" class="close" onclick="delRow(this)"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline" role="form">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>ID</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <input type="text" style="width:100%" class="form-control splitvalue" name="id" required>
+                                                                        </div>
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>Interface</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <input type="text" style="width:100%" class="form-control splitvalue" name="input_interface" required>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline" role="form">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>Address</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <input type="text" style="width:100%" class="form-control splitvalue" name="address" required><!--스크립트에서 막기-->
+                                                                        </div>
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>Broadcasted</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <select class="form-select form-select-sm form-control" style="width:100%" name="broadcasted" required>
+                                                                                <option value="no" selected >No</option>
+                                                                                <option value="yes">Yes</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container_fluid pt-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="d-inline">
+                                                <a onclick="addRow()" class="btn btn-primary btn-user ">
+                                                    추가하기
+                                                </a>
+                                            </div>
+                                            <div class="d-inline">
+                                                <a data-toggle="modal" data-target="#Configure_Input_List" class="btn btn-primary btn-user ">
+                                                    불러오기
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button onclick="return chk_GroupId()" class="btn btn-dark btn-user">저장하기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Configure_Input_Add 팝업 창 -->
+                <!-- Configure_Input_Update 팝업 창 -->
+                <form name="Update_Input" th:if="${group_id}!=null" action="input" method="post">
+                    <input type="hidden" th:if="${fix}!=1" value="update" name="query">
+                    <input type="hidden" th:if="${fix}==1" value="insert" name="query">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="text-right">
+                                    <button type="button" class="close" onclick="location.href='input'"><span aria-hidden="true"><h2>×</h2></span>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="form-inline" role="form">
+                                            <li>Input ID</li>
+                                            <input type="text" class="form-control" th:if="${fix}!=1" th:value="${group_id}" name="group_id" readonly>
+                                            <input type="text" class="form-control" th:if="${fix}==1" th:value="${group_id}+_1" name="group_id">
+                                            <input type="hidden" th:value="${getInputByGroupId.get(0).getCreate_time()}" name="create_time">
+                                            <input type="hidden" th:if="${fix}!=1" th:value="${getInputByGroupId.get(0).getSelected()}" name="selected">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="Input_Card">
+                                    <div class="index pb-3" th:each="m, i : ${getInputByGroupId}">
+                                        <div class="row">
+                                            <div class="w-50">
+                                                <div class="border">
+                                                    <div class="container_fluid">
+                                                        <div class="row">
+                                                            <div class="col text-right pt-2 mr-2">
+                                                                <button type="button" class="close" onclick="delRow(this)"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline" role="form">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>ID</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <input type="text" style="width:100%" class="form-control splitvalue" th:value="${m.getId()}" name="id" required>
+                                                                        </div>
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>Interface</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <input type="text" style="width:100%" class="form-control splitvalue" th:value="${m.getInput_interface()}" name="input_interface" required>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pt-3">
+                                                            <div class="form-inline" role="form">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>Address</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <input type="text" style="width:100%" class="form-control splitvalue" th:value="${m.getAddress()}" name="address" required><!--스크립트에서 막기-->
+                                                                        </div>
+                                                                        <div class="col-2 align-self-center">
+                                                                            <span>Broadcasted</span>
+                                                                        </div>
+                                                                        <div class="col-4 align-self-center">
+                                                                            <select class="form-select form-select-sm form-control" style="width:100%" name="broadcasted" required>
+                                                                                <option value="no" th:selected="${#strings.equals(m.getBroadcasted(), 'no')}">No</option>
+                                                                                <option value="yes" th:selected="${#strings.equals(m.getBroadcasted(), 'yes')}">Yes</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="container_fluid pt-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="d-inline">
+                                                <a onclick="addRow()" class="btn btn-primary btn-user ">
+                                                    추가하기
+                                                </a>
+                                            </div>
+                                            <div class="d-inline">
+                                                <a th:href="@{input/delete(group_id=${group_id})}" class="btn btn-primary btn-user" onclick="return chkDelete()">
+                                                    삭제하기
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button type="submit" onclick="return chk_Value()" class="btn btn-dark btn-user">저장하기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Configure_Input_Update 팝업 창 -->
+            </div>
+            <!-- / 대쉬보드 - Configure_Main-->
+        </div>
+        <!-- End of Main Content -->
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+
+<!-- Configure_Input_List 팝업 창 -->
+<div id="Configure_Input_List" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <li>
+                    List
+                </li>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="text-center btn-block">
+                            <div th:each="m, i : ${getListGroupConcat}" class="pb-1">
+                                <button class=" btn-light btn-block btn" th:text="${m.getGroup_id()}" th:onclick="|location.href='@{input(group_id=${m.getGroup_id()},fix='1')}'|"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Configure_Input_List 팝업 창 -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+<script defer src="/js/config/input.js"></script>
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+</body>
+
+<script>
+    history.pushState(null, null, 'input');
+    window.onpopstate = function(event) {
+        history.go(1);
+    };
+</script>
+
+
+</html>

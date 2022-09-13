@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ComposerDAO">
+    <select id="getListAll" resultType="ComposerDTO">
+        select * from next_multi_view.TEST_GRID_COMPOSER_LIST;
+    </select>
+    <select id="getListGroupConcat" resultType="ComposerConcatDTO">
+        select selected, group_id, group_concat(id order by id separator ', ') id_concat from next_multi_view.TEST_GRID_COMPOSER_LIST group by group_id, create_time,selected order by create_time desc;
+    </select>
+    <select id="getComposerByGroupId" resultType="ComposerDTO">
+        SELECT * FROM next_multi_view.TEST_GRID_COMPOSER_LIST WHERE group_id = #{group_id};
+    </select>
+    <select id="getGridComposerListAPI" resultType="GridComposerListAPI">
+        SELECT id, width, height FROM next_multi_view.TEST_GRID_COMPOSER_LIST WHERE group_id = #{group_id};
+    </select>
+    <select id="getGridComposerListSplitAPI" resultType="GridComposerListSplitAPI">
+        SELECT id, width, height, grid_matrix_0, grid_matrix_1, grid_matrix_2, grid_matrix_3, grid_matrix_4, grid_matrix_5,
+        grid_matrix_6, grid_matrix_7, grid_matrix_8, grid_matrix_9, grid_matrix_10 FROM next_multi_view.TEST_GRID_COMPOSER_LIST WHERE group_id = #{group_id};
+    </select>
+    <delete id="deleteListByGroupId">
+        DELETE FROM next_multi_view.TEST_GRID_COMPOSER_LIST WHERE group_id = #{group_id};
+    </delete>
+    <insert id="insertList">
+        INSERT INTO next_multi_view.TEST_GRID_COMPOSER_LIST VALUES
+        <foreach collection="composerDTOList" item="list" separator=",">
+            (#{list.group_id}, #{list.id}, #{list.width}, #{list.height}, #{list.grid_matrix_0}, #{list.grid_matrix_1}, #{list.grid_matrix_2}, #{list.grid_matrix_3}
+            , #{list.grid_matrix_4}, #{list.grid_matrix_5}, #{list.grid_matrix_6}, #{list.grid_matrix_7}, #{list.grid_matrix_8}, #{list.grid_matrix_9}, #{list.grid_matrix_10}
+            <if test="now">, now()</if> <if test="!now">, #{list.create_time}</if>, #{list.selected})
+        </foreach>
+    </insert>
+</mapper>

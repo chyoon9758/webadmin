@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.admin.DAO.PresetVideoDAO">
+
+    <select id="getListAll" resultType="com.web.admin.DTO.PresetVideoDTO">
+        select * from next_multi_view.TEST_PRESET_VIDEO
+    </select>
+
+    <select id="getListGroupConcat" resultType="com.web.admin.DTO.PresetVideoDTO">
+        select selected, group_id, group_concat(id order by id separator ', ') id_concat from next_multi_view.TEST_PRESET_VIDEO group by group_id,create_time,selected order by create_time desc;
+    </select>
+
+    <select id="getInputByPresetId" resultType="com.web.admin.DTO.PresetVideoDTO">
+        SELECT * FROM next_multi_view.TEST_PRESET_VIDEO WHERE group_id = #{group_id};
+    </select>
+
+    <select id="getInputByData" resultType="com.web.admin.DTO.PresetVideoDTO">
+        SELECT selected, create_time FROM next_multi_view.TEST_PRESET_VIDEO WHERE group_id = #{group_id} group by group_id, create_time, selected;
+    </select>
+
+    <select id="getEncoderListAPI" resultType="com.web.admin.DTO.api.transcodingStandby.uplusIdolliveConfig.transConfigs.EncoderListAPI">
+        SELECT * FROM next_multi_view.TEST_PRESET_VIDEO WHERE group_id = #{group_id};
+    </select>
+
+
+    <insert id="insertVideoData" parameterType="com.web.admin.DTO.PresetVideoDTO">
+        insert into TEST_PRESET_VIDEO
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.group_id},
+            #{item.id},
+            #{item.codec},
+            #{item.width},
+            #{item.height},
+            #{item.bitrate},
+            #{item.profile},
+            #{item.level},
+            #{item.fps},
+            #{item.iframe_interval},
+            #{item.create_time},
+            #{item.selected}
+            )
+        </foreach>
+
+        ;
+    </insert>
+    <delete id="deletePresetId">
+        DELETE FROM next_multi_view.TEST_PRESET_VIDEO WHERE group_id = #{group_id};
+    </delete>
+
+
+</mapper>
